@@ -29,7 +29,7 @@ function smokestack(opts) {
 
   var stream = through(write, flush)
   var server = http.createServer()
-  var port   = opts.port || 15943
+  var port   = opts.port || 0
   var buffer = []
 
   server.on('request', function(req, res) {
@@ -43,6 +43,7 @@ function smokestack(opts) {
   })
 
   server.listen(port, function(err) {
+    port = server.address().port
     if (err) return stream.emit('error', err)
     debug('http://localhost:'+port+'/')
     listen = true
