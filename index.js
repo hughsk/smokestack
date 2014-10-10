@@ -102,7 +102,8 @@ function smokestack(opts) {
       , '--disable-popup-blocking'
       , '--disable-extensions'
       , '--user-data-dir=' + tmp
-    ]).once('exit', function() {
+    ]).once('close', function() {
+      server.close()
       stream.emit('end')
       process.nextTick(function() {
         stream.emit('close')
