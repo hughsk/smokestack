@@ -60,10 +60,10 @@ function smokestack(opts) {
     browser
       .pipe(split())
       .pipe(handle)
-      .pipe(browser)
       .once('close', function() {
-        launched.kill()
+        stream.shutdown()
       })
+      .pipe(browser)
   }).install(server, '/smokestack')
 
   function handleInput(data, _, next) {
@@ -77,6 +77,22 @@ function smokestack(opts) {
     var format = data.shift() // e.g. printf style
     stream.push(util.format.apply(util, [format].concat(data))+ '\n')
     next()
+  }
+
+  stream.shutdown = function shutdown() {
+    // ensure shutdown only called once
+    if (shutdown.called) return
+    shutdown.called = true
+    try {
+      launched.kill()
+    } catch(e) {}
+    stream.emit('end')
+    server._handle ? server.close(done) : done()
+    function done() {
+      stream.emit('close')
+      stream.emit('finish')
+      stream.emit('shutdown')
+    }
   }
 
   return stream
@@ -108,20 +124,16 @@ function smokestack(opts) {
       , '--disable-extensions'
       , '--user-data-dir=' + tmp
     ]).once('close', function() {
-      stream.emit('end')
       rimraf(tmp, function(err) {
         if (err) console.error( // ignore err, just log
           'Warning: could not clean up tmp dir: %s', tmp
         )
-        server.close(function() {
-          stream.emit('close')
-          stream.emit('finish')
-        })
+        stream.shutdown()
       })
     })
     stream.emit('spawn', launched)
     process.on('exit', function() {
-      launched.kill()
+      stream.shutdown()
     })
   }
 

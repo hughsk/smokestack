@@ -11,6 +11,28 @@ var path = require('path')
 var pkg = require('../package.json')
 var bin = path.resolve(__dirname, '..', pkg.bin[pkg.name])
 
+test('browser.shutdown will shut it all down', function(t) {
+  var browser = ss()
+  var child = undefined
+  var server = undefined
+  browser.once('spawn', function(spawned) {
+    child = spawned
+  })
+  browser.once('listen', function(listening) {
+    server = listening
+  })
+
+  browser.once('connect', function() {
+    browser.once('shutdown', function() {
+      t.ok(child.killed, 'child has been killed')
+      t.notOk(server._handle, 'server not listening')
+      t.end()
+    })
+    browser.shutdown()
+  })
+  browser.end()
+})
+
 test('kills process on window.close', function(t) {
   var browser = ss()
   var child = undefined
