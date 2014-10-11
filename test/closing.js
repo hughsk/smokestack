@@ -109,6 +109,28 @@ test('executable will close after --timeout time', function(t) {
   })
 })
 
+test('executable will close after --timeout time even if browser locked', function(t) {
+  getCloseTime(function(err, normalCloseTime) {
+    t.ifError(err)
+    var browser = spawn(bin, ['--timeout', normalCloseTime])
+    browser.stderr.pipe(process.stderr)
+    var start = Date.now()
+    browser.on('close', function() {
+      var end = Date.now()
+      clearTimeout(tooLong)
+      t.ok(end - start > normalCloseTime * 2)
+      t.end()
+    })
+
+    var tooLong = setTimeout(function() {
+      t.fail('Did not time out!')
+      browser.kill()
+    }, normalCloseTime * 4)
+    browser.stdin.write('while(true){}')
+    browser.stdin.end()
+  })
+})
+
 function getCloseTime(fn) {
   if (getCloseTime.value) return process.nextTick(function() {
     return fn(null, getCloseTime.value)

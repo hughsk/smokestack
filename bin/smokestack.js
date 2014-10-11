@@ -18,6 +18,11 @@ process.stdin.on('end', function() {
     browser.write(
       'setTimeout(function() {window.close()}, '+timeout+')'
     )
+    browser.once('spawn', function(child) {
+      setTimeout(function() {
+        child.kill('SIGTERM')
+      }, timeout * 2)
+    })
   }
   browser.end()
 })
