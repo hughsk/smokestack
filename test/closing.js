@@ -110,11 +110,16 @@ test('executable will close after --timeout time', function(t) {
 })
 
 function getCloseTime(fn) {
+  if (getCloseTime.value) return process.nextTick(function() {
+    return fn(null, getCloseTime.value)
+  })
+
   var browser = spawn(bin)
   var start = Date.now()
   browser.on('close', function() {
     var end = Date.now()
-    return fn(null, end - start)
+    getCloseTime.value = end - start
+    return fn(null, getCloseTime.value)
   })
   browser.stdin.write('window.close()\n')
   browser.stdin.end()
