@@ -7,6 +7,7 @@ var split    = require('split')
 var shoe     = require('shoe')
 var http     = require('http')
 var path     = require('path')
+var util     = require('util')
 var url      = require('url')
 var fs       = require('fs')
 
@@ -70,7 +71,8 @@ function smokestack(opts) {
     }
 
     var key = data.shift()
-    stream.push(data + '\n')
+    var format = data.shift() // e.g. printf style
+    stream.push(util.format.apply(util, [format].concat(data))+ '\n')
     next()
   }
 
