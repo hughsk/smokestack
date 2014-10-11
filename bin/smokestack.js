@@ -10,20 +10,12 @@ var argv = minimist(process.argv.slice(2), {
 
 var browser = ss()
 
-process.stdin.on('end', function() {
-  var timeout = parseInt(argv['timeout'], 10)
-  if (argv['close']) timeout = 1
+var timeout = parseInt(argv['timeout'], 10)
+if (argv['close'] && !timeout) timeout = 1
 
-  if (timeout) {
-    browser.write(
-      'setTimeout(function() {window.close()}, '+timeout+')'
-    )
-    browser.once('spawn', function(child) {
-      setTimeout(function() {
-        child.kill('SIGTERM')
-      }, timeout * 2)
-    })
-  }
+if (timeout) setupTimeout(browser, timeout)
+
+process.stdin.on('end', function() {
   browser.end()
 })
 
@@ -34,3 +26,20 @@ process.stdin
 browser.on('close', function() {
   process.exit()
 })
+
+function setupTimeout(browser, timeout) {
+  browser.write(
+    'setTimeout(function() {window.close()}, '+timeout+')'
+  )
+  browser.once('spawn', function(child) {
+    var kill = setTimeout(function() {
+      child.kill('SIGTERM')
+    }, timeout * 2)
+    browser.once('connect', function() {
+      clearTimeout(kill) // reset kill timeout if we connect
+      setTimeout(function() {
+        child.kill('SIGTERM')
+      }, timeout * 2)
+    })
+  })
+}
