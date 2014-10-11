@@ -35,11 +35,12 @@ function setupTimeout(browser, timeout) {
     var kill = setTimeout(function() {
       child.kill('SIGTERM')
     }, timeout * 2)
+    kill.unref()
     browser.once('connect', function() {
       clearTimeout(kill) // reset kill timeout if we connect
       setTimeout(function() {
         child.kill('SIGTERM')
-      }, timeout * 2)
+      }, timeout * 2).unref()
     })
   })
 }
