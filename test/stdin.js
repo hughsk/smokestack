@@ -31,39 +31,3 @@ test('can pipe data in and get stdout and stderr', function(t) {
   browser.stdin.write('window.close()\n')
   browser.stdin.end()
 })
-
-test('will close automatically with --close', function(t) {
-  getCloseTime(function(err, normalCloseTime) {
-    t.ifError(err)
-    var browser = spawn(bin, ['--close'])
-    browser.stderr.pipe(process.stderr)
-    browser.on('close', fail)
-
-    // browser should close in <~normalCloseTime if auto-closing.
-    setTimeout(function() {
-      browser.removeListener('close', fail)
-      browser.on('close', function() {
-        t.end()
-      })
-    }, normalCloseTime + normalCloseTime * 0.1)
-
-    browser.stdin.write('setTimeout(function() {window.close()}, '+normalCloseTime+')\n')
-    browser.stdin.end()
-
-    function fail() {
-      t.fail('Should not auto-close')
-      browser.kill()
-    }
-  })
-})
-
-function getCloseTime(fn) {
-  var browser = spawn(bin)
-  var start = Date.now()
-  browser.on('close', function() {
-    var end = Date.now()
-    return fn(null, end - start)
-  })
-  browser.stdin.write('window.close()\n')
-  browser.stdin.end()
-}

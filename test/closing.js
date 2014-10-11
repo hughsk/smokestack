@@ -5,6 +5,11 @@ var bl = require('bl')
 var ss = require('../')
 
 var exec = require('child_process').exec
+var spawn = require('child_process').spawn
+var path = require('path')
+
+var pkg = require('../package.json')
+var bin = path.resolve(__dirname, '..', pkg.bin[pkg.name])
 
 test('kills process on window.close', function(t) {
   var browser = ss()
@@ -48,3 +53,46 @@ test('close browser if process dies prematurely', function(t) {
   })
 })
 
+test('executable will close automatically with --close', function(t) {
+  var browser = spawn(bin, ['--close'])
+  browser.on('close', function() {
+    t.end()
+  })
+  browser.stdin.end()
+})
+
+test('executable will not close automatically without --close', function(t) {
+  getCloseTime(function(err, normalCloseTime) {
+    t.ifError(err)
+    var browser = spawn(bin)
+    browser.stderr.pipe(process.stderr)
+    browser.on('close', fail)
+
+    // browser should close in <~normalCloseTime if auto-closing.
+    setTimeout(function() {
+      browser.removeListener('close', fail)
+      browser.on('close', function() {
+        t.end()
+      })
+    }, normalCloseTime)
+
+    browser.stdin.write('setTimeout(function() {window.close()}, '+normalCloseTime+')\n')
+    browser.stdin.end()
+
+    function fail() {
+      t.fail('Should not auto-close')
+      browser.kill()
+    }
+  })
+})
+
+function getCloseTime(fn) {
+  var browser = spawn(bin)
+  var start = Date.now()
+  browser.on('close', function() {
+    var end = Date.now()
+    return fn(null, end - start)
+  })
+  browser.stdin.write('window.close()\n')
+  browser.stdin.end()
+}

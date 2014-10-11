@@ -10,7 +10,7 @@ var argv = minimist(process.argv.slice(2), {
 var browser = ss()
 
 process.stdin.on('end', function() {
-  if (!argv['close']) browser.write('window.close()')
+  if (argv['close']) browser.write('window.close()')
   browser.end()
 })
 
