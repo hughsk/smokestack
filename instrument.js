@@ -6,12 +6,8 @@ var console   = window.console
 ;['error'
 , 'info'
 , 'log'
+, 'debug'
 , 'warn'
-, 'dir'
-, 'time'
-, 'timeEnd'
-, 'trace'
-, 'assert'
 ].forEach(function(k) {
   var old = console[k]
   var prefix = [k]
