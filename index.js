@@ -26,6 +26,7 @@ function smokestack(opts) {
   opts = opts || {}
 
   var launched = null
+  var tmp = undefined
   var listen = false
   var script = false
 
@@ -79,20 +80,35 @@ function smokestack(opts) {
     next()
   }
 
-  stream.shutdown = function shutdown() {
+  stream.shutdown = function shutdown(fn) {
     // ensure shutdown only called once
-    if (shutdown.called) return
+    if (shutdown.called) return fn && fn()
+
     shutdown.called = true
-    try {
+    // kill child if necessary
+    if (!launched.killed) {
+      launched.once('close', next)
       launched.kill()
-    } catch(e) {}
-    stream.emit('end')
-    server._handle ? server.close(done) : done()
-    function done() {
-      stream.emit('close')
-      stream.emit('finish')
-      stream.emit('shutdown')
-      fn && fn()
+    } else {
+      next()
+    }
+    function next() {
+      // remove tmpdir if necessary
+      tmp ? rimraf(tmp, next) : next()
+      function next() {
+        // tmpdir if necessary
+        server._handle ? server.close(next) : next()
+        function next() {
+          tmp = null
+          stream.emit('end')
+          stream.emit('close')
+          process.nextTick(function() {
+            stream.emit('finish')
+            stream.emit('shutdown')
+            fn && fn()
+          })
+        }
+      }
     }
   }
 
@@ -112,7 +128,7 @@ function smokestack(opts) {
 
   function open() {
     var uri = 'http://localhost:'+port+'/'
-    var tmp = quicktmp()
+    tmp = quicktmp()
 
     launched = spawn(chrome, [
         '--app=' + uri
@@ -124,16 +140,13 @@ function smokestack(opts) {
       , '--disable-popup-blocking'
       , '--disable-extensions'
       , '--user-data-dir=' + tmp
-    ]).once('close', function() {
-      rimraf(tmp, function(err) {
-        if (err) console.error( // ignore err, just log
-          'Warning: could not clean up tmp dir: %s', tmp
-        )
-        stream.shutdown()
-      })
+    ]).once('exit', function() {
+      stream.shutdown()
     })
     stream.emit('spawn', launched)
-    process.on('exit', function() {
+    process.once('close', function() {
+      if (tmp) rimraf.sync(tmp)
+      tmp = null
       stream.shutdown()
     })
   }

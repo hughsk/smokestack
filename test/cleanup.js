@@ -12,7 +12,39 @@ test('will clean up tmpdir', function(t) {
   var browser = ss()
   browser.write('window.close()')
   browser.end()
-  browser.on('close', function() {
+  browser.on('shutdown', function() {
+    var tmpContentAfter = getSmokestackTmp()
+    t.deepEqual(tmpContentBefore, tmpContentAfter)
+    t.end()
+  })
+})
+
+test('will clean up tmpdir again', function(t) {
+  // test weird interplay when running multiple tests
+  var tmpContentBefore = getSmokestackTmp()
+
+  var browser = ss()
+  browser.write('window.close()')
+  browser.end()
+  browser.on('shutdown', function() {
+    var tmpContentAfter = getSmokestackTmp()
+    t.deepEqual(tmpContentBefore, tmpContentAfter)
+    t.end()
+  })
+})
+
+
+test('will clean up tmpdir if exit prematurely', function(t) {
+  var tmpContentBefore = getSmokestackTmp()
+
+  var browser = ss()
+  browser.end()
+  browser.on('spawn', function(child) {
+    setTimeout(function() {
+      child.kill()
+    }, 500)
+  })
+  browser.on('shutdown', function() {
     var tmpContentAfter = getSmokestackTmp()
     t.deepEqual(tmpContentBefore, tmpContentAfter)
     t.end()
