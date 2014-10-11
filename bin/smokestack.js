@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 var minimist = require('minimist')
+var finished = require('tap-finished');
+var through = require('through2')
 var ss = require('../')
 
 var argv = minimist(process.argv.slice(2), {
@@ -19,13 +21,31 @@ process.stdin.on('end', function() {
   browser.end()
 })
 
-process.stdin
+var pipeline = process.stdin
 .pipe(browser, {end: false})
-.pipe(process.stdout)
 
-browser.on('close', function() {
-  process.exit()
-})
+// TODO figure out a better way to handle closing the browser when tap
+// output is done. Probably doesn't belong in here.
+if (argv['tap']) {
+  pipeline.on('end', function() {
+    tapStream.end()
+  })
+
+  var tapStream = finished(function(result) {
+    browser.shutdown(function() {
+      console.log("result.ok ? 0 : 1", result.ok ? 0 : 1)
+      process.exit(result.ok ? 0 : 1)
+    })
+  })
+
+  pipeline = pipeline.pipe(through(function(data, enc, cb) {
+    tapStream.write(data)
+    this.push(data)
+    cb()
+  }))
+}
+
+pipeline.pipe(process.stdout)
 
 function setupTimeout(browser, timeout) {
   browser.write(

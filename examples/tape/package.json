@@ -1,0 +1,12 @@
+{
+  "name": "smokestack-tape",
+  "private": true,
+  "scripts": {
+    "test": "browserify test.js | smokestack --tap"
+  },
+  "dependencies": {
+    "smokestack": "../../",
+    "through": "~2.3.6",
+    "through2": "~0.6.3"
+  }
+}

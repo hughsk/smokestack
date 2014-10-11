@@ -21,6 +21,7 @@
     "rimraf": "~2.2.8",
     "shoe": "0.0.15",
     "split": "^0.3.0",
+    "tap-finished": "0.0.1",
     "through2": "^0.6.2"
   },
   "devDependencies": {
