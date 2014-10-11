@@ -52,6 +52,7 @@ function smokestack(opts) {
   })
 
   shoe(function(browser) {
+    stream.emit('connect', browser)
     var handle = through(handleInput)
 
     browser
@@ -112,6 +113,7 @@ function smokestack(opts) {
         stream.emit('finish')
       })
     })
+    stream.emit('spawn', launched)
   }
 
   function send(res, data, type) {
