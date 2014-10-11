@@ -49,7 +49,7 @@ test('close browser if process dies prematurely', function(t) {
         process.kill(pid) // should throw cause process is gone
       })
       t.end()
-    }, 2000)
+    }, 2500)
   })
 })
 
