@@ -3,13 +3,19 @@
 var minimist = require('minimist')
 var ss = require('../')
 
-var argv = minimist(process.argv.slice(2))
-
+var argv = minimist(process.argv.slice(2), {
+  boolean: 'open'
+})
 
 var browser = ss()
 
+process.stdin.on('end', function() {
+  if (!argv['open']) browser.write('window.close()')
+  browser.end()
+})
+
 process.stdin
-.pipe(browser)
+.pipe(browser, {end: false})
 .pipe(process.stdout)
 
 browser.on('close', function() {
