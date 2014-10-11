@@ -32,3 +32,8 @@ window.close = function() {
     close()
   })
 }
+
+window.onerror = function (message, filename, lineno, colno, error) {
+  console.error("%s\n%s", message, error && error.stack.toString());
+  window.close()
+}
