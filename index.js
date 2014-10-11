@@ -3,6 +3,7 @@ var debug    = require('debug')('smokestack')
 var spawn    = require('child_process').spawn
 var chrome   = require('chrome-location')
 var through  = require('through2')
+var rimraf   = require('rimraf')
 var split    = require('split')
 var shoe     = require('shoe')
 var http     = require('http')
@@ -106,11 +107,15 @@ function smokestack(opts) {
       , '--disable-extensions'
       , '--user-data-dir=' + tmp
     ]).once('close', function() {
-      server.close()
       stream.emit('end')
-      process.nextTick(function() {
-        stream.emit('close')
-        stream.emit('finish')
+      rimraf(tmp, function(err) {
+        if (err) console.error( // ignore err, just log
+          'Warning: could not clean up tmp dir: %s', tmp
+        )
+        server.close(function() {
+          stream.emit('close')
+          stream.emit('finish')
+        })
       })
     })
     stream.emit('spawn', launched)
