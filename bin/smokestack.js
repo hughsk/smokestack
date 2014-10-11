@@ -29,7 +29,7 @@ browser.on('close', function() {
 
 function setupTimeout(browser, timeout) {
   browser.write(
-    'setTimeout(function() {window.close()}, '+timeout+')'
+    ';setTimeout(function() {window.close()}, '+timeout+');\n'
   )
   browser.once('spawn', function(child) {
     var kill = setTimeout(function() {
