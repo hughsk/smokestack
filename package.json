@@ -16,15 +16,18 @@
   "dependencies": {
     "chrome-location": "^1.0.1",
     "debug": "^2.0.0",
+    "minimist": "~1.1.0",
     "quick-tmp": "0.0.0",
     "shoe": "0.0.15",
     "split": "^0.3.0",
     "through2": "^0.6.2"
   },
   "devDependencies": {
+    "bl": "~0.9.3",
     "browserify": "^6.0.3",
     "json-stringify-safe": "^5.0.0",
-    "sliced": "0.0.5"
+    "sliced": "0.0.5",
+    "tape": "~3.0.0"
   },
   "repository": {
     "type": "git",
