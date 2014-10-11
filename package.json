@@ -9,7 +9,8 @@
   "license": "MIT",
   "scripts": {
     "prepublish": "browserify instrument.js -o bundle.js",
-    "test": "npm run prepublish && node proof.js"
+    "pretest": "npm run prepublish",
+    "test": "tape test/*.js"
   },
   "author": "Hugh Kennedy <hughskennedy@gmail.com> (http://hughsk.io/)",
   "dependencies": {
