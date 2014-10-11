@@ -139,6 +139,7 @@ function smokestack(opts) {
       , '--disable-default-apps'
       , '--disable-popup-blocking'
       , '--disable-extensions'
+      , '--disable-zero-browsers-open-for-tests'
       , '--user-data-dir=' + tmp
     ]).once('exit', function() {
       stream.shutdown()
