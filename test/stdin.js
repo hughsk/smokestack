@@ -28,13 +28,14 @@ test('can pipe data in and get stdout and stderr', function(t) {
   browser.stdin.write('console.info("info")\n')
   browser.stdin.write('console.warn("warn")\n')
   browser.stdin.write('console.error("error")\n')
+  browser.stdin.write('window.close()\n')
   browser.stdin.end()
 })
 
-test('will not close automatically with --open', function(t) {
+test('will close automatically with --close', function(t) {
   getCloseTime(function(err, normalCloseTime) {
     t.ifError(err)
-    var browser = spawn(bin, ['--open'])
+    var browser = spawn(bin, ['--close'])
     browser.stderr.pipe(process.stderr)
     browser.on('close', fail)
 
@@ -63,5 +64,6 @@ function getCloseTime(fn) {
     var end = Date.now()
     return fn(null, end - start)
   })
+  browser.stdin.write('window.close()\n')
   browser.stdin.end()
 }
