@@ -86,6 +86,29 @@ test('executable will not close automatically without --close', function(t) {
   })
 })
 
+test('executable will close after --timeout time', function(t) {
+  getCloseTime(function(err, normalCloseTime) {
+    t.ifError(err)
+    var browser = spawn(bin, ['--timeout', normalCloseTime])
+    browser.stderr.pipe(process.stderr)
+    browser.on('close', fail)
+
+    setTimeout(function() {
+      browser.removeListener('close', fail)
+      browser.on('close', function() {
+        t.end()
+      })
+    }, normalCloseTime)
+
+    browser.stdin.end()
+
+    function fail() {
+      t.fail('Should not auto-close')
+      browser.kill()
+    }
+  })
+})
+
 function getCloseTime(fn) {
   var browser = spawn(bin)
   var start = Date.now()

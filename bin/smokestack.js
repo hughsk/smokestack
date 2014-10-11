@@ -4,13 +4,21 @@ var minimist = require('minimist')
 var ss = require('../')
 
 var argv = minimist(process.argv.slice(2), {
-  boolean: 'close'
+  boolean: 'close',
+  alias: { t: 'timeout' }
 })
 
 var browser = ss()
 
 process.stdin.on('end', function() {
-  if (argv['close']) browser.write('window.close()')
+  var timeout = parseInt(argv['timeout'], 10)
+  if (argv['close']) timeout = 1
+
+  if (timeout) {
+    browser.write(
+      'setTimeout(function() {window.close()}, '+timeout+')'
+    )
+  }
   browser.end()
 })
 
