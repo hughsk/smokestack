@@ -12,6 +12,7 @@ var pkg = require('../package.json')
 var bin = path.resolve(__dirname, '..', pkg.bin[pkg.name])
 
 test('browser.shutdown will shut it all down', function(t) {
+  t.plan(3)
   var browser = ss()
   var child = undefined
   var server = undefined
@@ -26,9 +27,10 @@ test('browser.shutdown will shut it all down', function(t) {
     browser.once('shutdown', function() {
       t.ok(child.killed, 'child has been killed')
       t.notOk(server._handle, 'server not listening')
-      t.end()
     })
-    browser.shutdown()
+    browser.shutdown(function() {
+      t.ok(true)
+    })
   })
   browser.end()
 })

@@ -92,6 +92,7 @@ function smokestack(opts) {
       stream.emit('close')
       stream.emit('finish')
       stream.emit('shutdown')
+      fn && fn()
     }
   }
 
