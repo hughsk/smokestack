@@ -70,7 +70,7 @@ function smokestack(opts) {
     }
 
     var key = data.shift()
-    console[key].apply(console, data)
+    stream.push(data + '\n')
     next()
   }
 
