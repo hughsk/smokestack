@@ -114,6 +114,9 @@ function smokestack(opts) {
       })
     })
     stream.emit('spawn', launched)
+    process.on('exit', function() {
+      launched.kill()
+    })
   }
 
   function send(res, data, type) {

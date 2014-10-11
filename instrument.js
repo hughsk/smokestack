@@ -33,6 +33,10 @@ window.close = function() {
   })
 }
 
+shoe.on('end', function() {
+  close()
+})
+
 window.onerror = function (message, filename, lineno, colno, error) {
   console.error("%s\n%s", message, error && error.stack.toString());
   window.close()
