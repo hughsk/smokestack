@@ -45,6 +45,7 @@ function smokestack(opts) {
   })
 
   server.listen(port, function(err) {
+    stream.emit('listen', server)
     port = server.address().port
     if (err) return stream.emit('error', err)
     debug('http://localhost:'+port+'/')
