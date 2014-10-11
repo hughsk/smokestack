@@ -145,9 +145,10 @@ function smokestack(opts) {
       stream.shutdown()
     })
     stream.emit('spawn', launched)
+    process.once('exit', function() {
+      stream.shutdown()
+    })
     process.once('close', function() {
-      if (tmp) rimraf.sync(tmp)
-      tmp = null
       stream.shutdown()
     })
   }
