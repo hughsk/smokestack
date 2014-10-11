@@ -3,16 +3,15 @@
   "version": "1.0.0",
   "description": "Pipe your JavaScript into a browser, logging console output in Node",
   "main": "index.js",
+  "bin": {
+    "smokestack": "bin/smokestack.js"
+  },
   "license": "MIT",
   "scripts": {
     "prepublish": "browserify instrument.js -o bundle.js",
     "test": "npm run prepublish && node proof.js"
   },
-  "author": {
-    "name": "Hugh Kennedy",
-    "email": "hughskennedy@gmail.com",
-    "url": "http://hughsk.io/"
-  },
+  "author": "Hugh Kennedy <hughskennedy@gmail.com> (http://hughsk.io/)",
   "dependencies": {
     "chrome-location": "^1.0.1",
     "debug": "^2.0.0",
@@ -46,5 +45,8 @@
   "homepage": "https://github.com/hughsk/smokestack",
   "bugs": {
     "url": "https://github.com/hughsk/smokestack/issues"
+  },
+  "directories": {
+    "test": "test"
   }
 }
