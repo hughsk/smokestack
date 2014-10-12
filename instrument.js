@@ -14,7 +14,11 @@ var console   = window.console
   var prefix = [k]
 
   console[k] = function() {
-    var args = slice(arguments).map(function(item) {
+    // keep original args so browser can log as usual
+    var args = slice(arguments)
+
+    // prepare args for transport
+    var cleanArgs = args.map(function(item) {
       // no sensible default for stringifying
       // DOM Elements nicely so just toString and let
       // whoever is logging handle stringification.
@@ -22,7 +26,7 @@ var console   = window.console
       return item
     })
 
-    var data = stringify(prefix.concat(args))
+    var data = stringify(prefix.concat(cleanArgs))
 
     shoe.write(data)
     shoe.write('\n')
