@@ -33,7 +33,6 @@ if (argv['tap']) {
 
   var tapStream = finished(function(result) {
     browser.shutdown(function() {
-      console.log("result.ok ? 0 : 1", result.ok ? 0 : 1)
       process.exit(result.ok ? 0 : 1)
     })
   })
