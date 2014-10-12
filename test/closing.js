@@ -122,7 +122,7 @@ test('executable will close after --timeout time', function(t) {
       browser.on('close', function() {
         t.end()
       })
-    }, normalCloseTime)
+    }, normalCloseTime - normalCloseTime * 0.2)
 
     browser.stdin.end()
 
