@@ -73,8 +73,7 @@ function smokestack(opts) {
     }
 
     var key = data.shift()
-    var format = data.shift() // e.g. printf style
-    stream.push(util.format.apply(util, [format].concat(data))+ '\n')
+    stream.push(data + '\n')
     next()
   }
 

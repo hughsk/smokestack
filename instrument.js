@@ -1,8 +1,9 @@
 var shoe      = require('shoe')('/smokestack')
-var stringify = require('json-stringify-safe')
+var stringify = require('./serialise')
 var slice     = require('sliced')
 var isDom     = require('is-dom')
 var console   = window.console
+var format    = require('util').format
 
 ;['error'
 , 'info'
@@ -22,11 +23,12 @@ var console   = window.console
       // no sensible default for stringifying
       // DOM Elements nicely so just toString and let
       // whoever is logging handle stringification.
-      if (isDom(item)) return item.toString()
+      if (item && isDom(item)) return item.toString()
       return item
     })
 
-    var data = stringify(prefix.concat(cleanArgs))
+    var output = format.apply(null, cleanArgs)
+    var data = JSON.stringify(prefix.concat(output))
 
     shoe.write(data)
     shoe.write('\n')
