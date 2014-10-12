@@ -61,9 +61,7 @@ function smokestack(opts) {
     browser
       .pipe(split())
       .pipe(handle)
-      .once('close', function() {
-        stream.shutdown()
-      })
+      .once('close', stream.shutdown)
       .pipe(browser)
   }).install(server, '/smokestack')
 
@@ -83,10 +81,13 @@ function smokestack(opts) {
   stream.shutdown = function shutdown(fn) {
     // ensure shutdown only called once
     if (shutdown.called) return fn && fn()
+    process.removeListener('exit', stream.shutdown)
+    process.removeListener('close', stream.shutdown)
+    launched && launched.removeListener('exit', stream.shutdown)
 
     shutdown.called = true
     // kill child if necessary
-    if (!launched.killed) {
+    if (launched && !launched.killed) {
       launched.once('close', next)
       launched.kill()
     } else {
@@ -141,16 +142,10 @@ function smokestack(opts) {
       , '--disable-extensions'
       , '--disable-zero-browsers-open-for-tests'
       , '--user-data-dir=' + tmp
-    ]).once('exit', function() {
-      stream.shutdown()
-    })
+    ]).once('exit', stream.shutdown)
     stream.emit('spawn', launched)
-    process.once('exit', function() {
-      stream.shutdown()
-    })
-    process.once('close', function() {
-      stream.shutdown()
-    })
+    process.once('exit', stream.shutdown)
+    process.once('close', stream.shutdown)
   }
 
   function send(res, data, type) {
