@@ -16,7 +16,7 @@
   "dependencies": {
     "chrome-location": "^1.0.1",
     "debug": "^2.0.0",
-    "is-dom": "~1.0.2",
+    "is-dom": "~1.0.3",
     "minimist": "~1.1.0",
     "quick-tmp": "0.0.0",
     "rimraf": "~2.2.8",
