@@ -1,5 +1,4 @@
 var shoe      = require('shoe')('/smokestack')
-var stringify = require('./serialise')
 var slice     = require('sliced')
 var isDom     = require('is-dom')
 var console   = window.console
