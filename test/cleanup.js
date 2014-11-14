@@ -11,12 +11,13 @@ test('will clean up tmpdir', function(t) {
 
   var browser = ss()
   browser.write('window.close()')
-  browser.end()
   browser.on('shutdown', function() {
     var tmpContentAfter = getSmokestackTmp()
     t.deepEqual(tmpContentBefore, tmpContentAfter)
     t.end()
   })
+
+  browser.end()
 })
 
 test('will clean up tmpdir again', function(t) {
@@ -57,4 +58,3 @@ function getSmokestackTmp() {
     return /^smokestack/.test(item) // item starts with 'smokestack'
   })
 }
-

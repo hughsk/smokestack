@@ -4,6 +4,7 @@ var spawn    = require('child_process').spawn
 var chrome   = require('chrome-location')
 var through  = require('through2')
 var rimraf   = require('rimraf')
+var mkdirp   = require('mkdirp')
 var split    = require('split')
 var shoe     = require('shoe')
 var http     = require('http')
@@ -11,6 +12,7 @@ var path     = require('path')
 var util     = require('util')
 var url      = require('url')
 var fs       = require('fs')
+var bl       = require('bl')
 
 var bundle = fs.readFileSync(
   path.join(__dirname, 'bundle.js')
@@ -40,6 +42,8 @@ function smokestack(opts) {
     if (uri === '/') return send(res, index, 'text/html')
     if (uri === '/script.js') return send(res, buffer, 'text/javascript')
     if (uri === '/favicon.ico') return res.end()
+    if (uri === '/_upload') return upload(req, res)
+
     res.statusCode = 302
     res.setHeader('Location', '/')
     res.end()
@@ -131,16 +135,15 @@ function smokestack(opts) {
     tmp = quicktmp()
 
     launched = spawn(chrome, [
-        '--app=' + uri
-      , '--disable-extensions'
+        '--app='+uri
       , '--no-first-run'
       , '--disable-translate'
       , '--no-default-browser-check'
       , '--disable-default-apps'
       , '--disable-popup-blocking'
-      , '--disable-extensions'
       , '--disable-zero-browsers-open-for-tests'
       , '--user-data-dir=' + tmp
+      , '--load-extension=' + __dirname + '/lib/extension-chrome'
     ]).once('exit', stream.shutdown)
     stream.emit('spawn', launched)
     process.once('exit', stream.shutdown)
@@ -150,5 +153,31 @@ function smokestack(opts) {
   function send(res, data, type) {
     res.setHeader('content-type', type)
     res.end(data)
+  }
+
+  function upload(req, res) {
+    req.pipe(bl(function(err, data) {
+      if (err) return bail(err, req, res)
+
+      data = JSON.parse(data)
+
+      var dst = path.resolve(data.dst)
+      var uri = data.uri.replace(/^.+base64,/g, '')
+      var img = new Buffer(uri, 'base64')
+
+      mkdirp(path.dirname(dst), function(err) {
+        if (err) return bail(err, req, res)
+
+        fs.writeFile(dst, img, function(err) {
+          if (err) return bail(err, req, res)
+          res.end()
+        })
+      })
+    }))
+  }
+
+  function bail(err, req, res) {
+    res.statusCode = 500
+    res.end([err.message, err.stack].join('\n'))
   }
 }
