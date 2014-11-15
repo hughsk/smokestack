@@ -151,9 +151,19 @@ function smokestack(opts) {
         ])
       break
       case 'firefox':
+        mkdirp.sync(tmp)
+        fs.writeFileSync(path.join(tmp, 'user.js'), [
+            'user_pref("browser.shell.checkDefaultBrowser", false);'
+          , 'user_pref("browser.bookmarks.restore_default_bookmarks", false);'
+          , 'user_pref("dom.allow_scripts_to_close_windows", true);'
+          , 'user_pref("dom.disable_open_during_load", false);'
+          , 'user_pref("dom.max_script_run_time", 0);'
+        ].join('\n'))
+
         launched = spawn(firefox, [
             uri
           , '-new-instance'
+          , '-no-remote'
           , '-profile', tmp
           , '-purgecaches'
         ])
