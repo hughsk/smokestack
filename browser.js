@@ -15,6 +15,12 @@ function capture(dst, done) {
 
 exports.capture = function(dst, done) {
   setTimeout(function() {
+    if (!window.chrome) {
+      return done(new Error(
+        'Screen captures are not supported in this browser'
+      ))
+    }
+
     document.body.dispatchEvent(DOMEvent('smokestack:capture'))
     document.body.addEventListener('smokestack:captured', captured, false)
 
