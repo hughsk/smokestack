@@ -11,7 +11,7 @@
   "scripts": {
     "prepublish": "browserify instrument.js -o bundle.js",
     "pretest": "npm prune && npm run prepublish",
-    "test": "node test/index.js"
+    "test": "node test/index.js | tap-spec"
   },
   "author": "Hugh Kennedy <hughskennedy@gmail.com> (http://hughsk.io/)",
   "dependencies": {
@@ -37,6 +37,7 @@
     "json-stringify-safe": "^5.0.0",
     "pngparse-sync": "^1.0.2",
     "sliced": "0.0.5",
+    "tap-spec": "^1.0.1",
     "tape": "~3.0.0"
   },
   "repository": {
