@@ -9,7 +9,7 @@ var ss = require('../')
 test('will clean up tmpdir', function(t) {
   var tmpContentBefore = getSmokestackTmp()
 
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
   browser.write('window.close()')
   browser.on('shutdown', function() {
     var tmpContentAfter = getSmokestackTmp()
@@ -24,7 +24,7 @@ test('will clean up tmpdir again', function(t) {
   // test weird interplay when running multiple tests
   var tmpContentBefore = getSmokestackTmp()
 
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
   browser.write('window.close()')
   browser.end()
   browser.on('shutdown', function() {
@@ -38,7 +38,7 @@ test('will clean up tmpdir again', function(t) {
 test('will clean up tmpdir if exit prematurely', function(t) {
   var tmpContentBefore = getSmokestackTmp()
 
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
   browser.end()
   browser.on('spawn', function(child) {
     setTimeout(function() {

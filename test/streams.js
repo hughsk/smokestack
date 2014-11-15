@@ -5,7 +5,7 @@ var bl = require('bl')
 var ss = require('../')
 
 test('can pipe data in and get stderr and stdout', function(t) {
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
   browser.pipe(bl(function(err, data) {
     t.deepEqual(data.toString().trim().split('\n'), [
       'log',

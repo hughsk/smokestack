@@ -13,7 +13,7 @@ var bin = path.resolve(__dirname, '..', pkg.bin[pkg.name])
 
 test('browser.shutdown will shut it all down', function(t) {
   t.plan(3)
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
   var child = undefined
   var server = undefined
   browser.once('spawn', function(spawned) {
@@ -36,7 +36,7 @@ test('browser.shutdown will shut it all down', function(t) {
 })
 
 test('kills process on window.close', function(t) {
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
   var child = undefined
   browser.once('spawn', function(spawned) {
     child = spawned
@@ -55,7 +55,7 @@ test('kills process on window.close', function(t) {
 test('close browser if process dies prematurely', function(t) {
   var program = [
     "var ss = require('"+require.resolve('../')+"')",
-    "var browser = ss()",
+    "var browser = ss({ browser: process.env.browser })",
     "browser.on('spawn', function(child) {",
     "  console.log(child.pid)",
     "})",
@@ -78,7 +78,7 @@ test('close browser if process dies prematurely', function(t) {
 })
 
 test('executable will close automatically with --close', function(t) {
-  var browser = spawn(bin, ['--close'])
+  var browser = spawn(bin, ['--close', '-b', process.env.browser])
   browser.once('close', function() {
     t.end()
   })
@@ -88,7 +88,7 @@ test('executable will close automatically with --close', function(t) {
 test('executable will not close automatically without --close', function(t) {
   getCloseTime(function(err, normalCloseTime) {
     t.ifError(err)
-    var browser = spawn(bin)
+    var browser = spawn(bin, ['-b', process.env.browser])
     browser.stderr.pipe(process.stderr)
     browser.once('close', fail)
 
@@ -113,7 +113,7 @@ test('executable will not close automatically without --close', function(t) {
 test('executable will close after --timeout time', function(t) {
   getCloseTime(function(err, normalCloseTime) {
     t.ifError(err)
-    var browser = spawn(bin, ['--timeout', normalCloseTime/2])
+    var browser = spawn(bin, ['--timeout', normalCloseTime/2, '-b', process.env.browser])
     browser.stdout.pipe(process.stdout)
     browser.once('close', fail)
 
@@ -136,7 +136,7 @@ test('executable will close after --timeout time', function(t) {
 test('executable will close after --timeout time even if browser locked', function(t) {
   getCloseTime(function(err, normalCloseTime) {
     t.ifError(err)
-    var browser = spawn(bin, ['--timeout', normalCloseTime/2])
+    var browser = spawn(bin, ['--timeout', normalCloseTime/2, '-b', process.env.browser])
     browser.stderr.pipe(process.stderr)
     browser.once('close', function() {
       clearTimeout(tooLong)
@@ -157,7 +157,7 @@ function getCloseTime(fn) {
     return fn(null, getCloseTime.value)
   })
 
-  var browser = spawn(bin)
+  var browser = spawn(bin, ['-b', process.env.browser])
   var start = Date.now()
   browser.once('close', function() {
     var end = Date.now()

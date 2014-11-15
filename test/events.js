@@ -6,7 +6,7 @@ var ss = require('../')
 
 test('emits some status events', function(t) {
   t.plan(6)
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
 
   browser.once('listen', function(server) {
     t.ok(server, 'listen emits data')

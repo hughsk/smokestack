@@ -6,7 +6,7 @@ var ss = require('../')
 var exec = require('child_process').exec
 
 test('can log html elements', function(t) {
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
   browser.pipe(bl(function(err, data) {
     data = data.toString().trim()
     t.equal(data, '[object HTMLBodyElement]')
@@ -24,7 +24,7 @@ test('can log document', function(t) {
   // Test may seem redundant but any future adjustment to
   // logging of DOM Elements will need to take document
   // into account.
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
   browser.pipe(bl(function(err, data) {
     data = data.toString().trim()
     t.equal(data, '[object HTMLDocument]')
@@ -57,7 +57,7 @@ test('can log standard datatypes', function(t) {
   exec(process.execPath + ' -e "' + commands + '"', function(err, expected) {
     t.ifError(err)
     expected = expected.trim()
-    var browser = ss()
+    var browser = ss({ browser: process.env.browser })
     browser.write(commands + ';\n')
     browser.write('window.close()')
     browser.end()
@@ -91,7 +91,7 @@ test('can log standard datatypes printf style', function(t) {
   exec(process.execPath + ' -e "' + commands + '"', function(err, expected) {
     t.ifError(err)
     expected = expected.trim()
-    var browser = ss()
+    var browser = ss({ browser: process.env.browser })
     browser.write(commands + ';\n')
     browser.write('window.close()')
     browser.end()

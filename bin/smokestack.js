@@ -7,10 +7,15 @@ var ss = require('../')
 
 var argv = minimist(process.argv.slice(2), {
   boolean: 'close',
-  alias: { t: 'timeout' }
+  alias: {
+    t: 'timeout',
+    b: 'browser'
+  }
 })
 
-var browser = ss()
+var browser = ss({
+  browser: argv.browser
+})
 
 var timeout = parseInt(argv['timeout'], 10)
 if (argv['close'] && !timeout) timeout = 1

@@ -10,7 +10,7 @@ var pkg = require('../package.json')
 var bin = path.resolve(__dirname, '..', pkg.bin[pkg.name])
 
 test('can pipe data in and get stdout and stderr', function(t) {
-  var browser = spawn(bin)
+  var browser = spawn(bin, ['-b', process.env.browser])
   browser.stderr.pipe(process.stderr)
   browser.on('error', function() {
     t.fail('Exit with error!', arguments)

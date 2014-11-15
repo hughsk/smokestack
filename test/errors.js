@@ -5,7 +5,7 @@ var bl = require('bl')
 var ss = require('../')
 
 test('will report errors', function(t) {
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser })
   browser.pipe(bl(function(err, data) {
     t.ok(/badness happened/gm.test(data.toString()), 'contains error message')
     t.ok(

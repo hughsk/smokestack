@@ -1,4 +1,9 @@
-// require('./capture')
+process.env.browser = process.env.browser || 'chrome'
+
+if (process.env.browser === 'chrome') {
+  require('./capture')
+}
+
 require('./cleanup')
 require('./closing')
 require('./errors')
