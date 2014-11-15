@@ -9,12 +9,14 @@ var argv = minimist(process.argv.slice(2), {
   boolean: 'close',
   alias: {
     t: 'timeout',
-    b: 'browser'
+    b: 'browser',
+    p: 'port'
   }
 })
 
 var browser = ss({
-  browser: argv.browser
+  browser: argv.browser,
+  port: argv.port
 })
 
 var timeout = parseInt(argv['timeout'], 10)
