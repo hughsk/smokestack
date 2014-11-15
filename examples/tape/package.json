@@ -2,11 +2,10 @@
   "name": "smokestack-tape",
   "private": true,
   "scripts": {
-    "test": "browserify test.js | smokestack --tap"
+    "test": "browserify test.js | smokestack --tap | tap-spec"
   },
-  "dependencies": {
-    "smokestack": "../../",
-    "through": "~2.3.6",
-    "through2": "~0.6.3"
+  "devDependencies": {
+    "browserify": "^6.3.2",
+    "tap-spec": "^1.0.1"
   }
 }
