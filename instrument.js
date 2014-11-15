@@ -52,7 +52,16 @@ shoe.on('end', function() {
   close()
 })
 
-window.onerror = function (message, filename, lineno, colno, error) {
-  console.error("%s\n%s", message, error && error.stack.toString());
+// Not all browsers support the full function signature
+// of window.onerror, so the Error instance is not always
+// guaranteed:
+// http://danlimerick.wordpress.com/2014/01/18/how-to-catch-javascript-errors-with-window-onerror-even-on-chrome-and-firefox/
+window.onerror = function(message, filename, line, col, error) {
+  if (error) {
+    console.error("%s\n%s", message, error && error.stack.toString());
+  } else {
+    console.error('%s\nError Line: %s', message, line)
+  }
+
   window.close()
 }

@@ -4,16 +4,27 @@ var test = require("tape")
 var bl = require('bl')
 var ss = require('../')
 
+var browserKind = process.env.browser
+
 test('will report errors', function(t) {
-  var browser = ss({ browser: process.env.browser })
-  browser.pipe(bl(function(err, data) {
-    t.ok(/badness happened/gm.test(data.toString()), 'contains error message')
-    t.ok(
-      /at http:\/\/localhost/gm.test(data.toString()),
-      'contains something that looks like a trace'
-    )
+  var browser = ss({ browser: browserKind })
+  var stack = /at http:\/\/localhost/g
+  var line = /Line\: \d+/g
+
+  var buffer = bl(function(err, data) {
+    data = String(data)
+
+    t.ok(/badness happened/gm.test(data), 'contains error message')
+    if (browserKind === 'firefox') {
+      t.ok(line.test(data), 'contains line number')
+    } else {
+      t.ok(stack.test(data), 'contains something that looks like a trace')
+    }
+
     t.end()
-  }))
+  })
+
+  browser.pipe(buffer)
   browser.write('throw new Error("badness happened")\n')
   browser.end()
 })
