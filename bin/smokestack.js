@@ -24,26 +24,6 @@ process.stdin.on('end', function() {
 var pipeline = process.stdin
 .pipe(browser, {end: false})
 
-// TODO figure out a better way to handle closing the browser when tap
-// output is done. Probably doesn't belong in here.
-if (argv['tap']) {
-  pipeline.on('end', function() {
-    tapStream.end()
-  })
-
-  var tapStream = finished(function(result) {
-    browser.shutdown(function() {
-      process.exit(result.ok ? 0 : 1)
-    })
-  })
-
-  pipeline = pipeline.pipe(through(function(data, enc, cb) {
-    tapStream.write(data)
-    this.push(data)
-    cb()
-  }))
-}
-
 pipeline.pipe(process.stdout)
 
 function setupTimeout(browser, timeout) {
