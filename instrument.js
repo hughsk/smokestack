@@ -39,10 +39,12 @@ var format    = require('util').format
 var close = window.close
 
 window.close = function() {
-  shoe.write(JSON.stringify({ end: true }))
-  shoe.write('\n')
-  shoe.once('data', function(data) {
-    close()
+  setTimeout(function() {
+    shoe.write(JSON.stringify({ end: true }))
+    shoe.write('\n')
+    shoe.once('data', function(data) {
+      close()
+    })
   })
 }
 
