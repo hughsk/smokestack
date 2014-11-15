@@ -18,6 +18,7 @@
     "bl": "^0.9.3",
     "chrome-location": "^1.0.1",
     "debug": "^2.0.0",
+    "firefox-location": "^1.0.0",
     "is-dom": "~1.0.4",
     "minimist": "~1.1.0",
     "mkdirp": "^0.5.0",

@@ -1,6 +1,7 @@
 var quicktmp = require('quick-tmp')('smokestack')
 var debug    = require('debug')('smokestack')
 var spawn    = require('child_process').spawn
+var firefox  = require('firefox-location')
 var chrome   = require('chrome-location')
 var through  = require('through2')
 var rimraf   = require('rimraf')
@@ -27,6 +28,7 @@ module.exports = smokestack
 function smokestack(opts) {
   opts = opts || {}
 
+  var browser = opts.browser || 'firefox'
   var launched = null
   var tmp = undefined
   var listen = false
@@ -134,17 +136,34 @@ function smokestack(opts) {
     var uri = 'http://localhost:'+port+'/'
     tmp = quicktmp()
 
-    launched = spawn(chrome, [
-        '--app='+uri
-      , '--no-first-run'
-      , '--disable-translate'
-      , '--no-default-browser-check'
-      , '--disable-default-apps'
-      , '--disable-popup-blocking'
-      , '--disable-zero-browsers-open-for-tests'
-      , '--user-data-dir=' + tmp
-      , '--load-extension=' + __dirname + '/lib/extension-chrome'
-    ]).once('exit', stream.shutdown)
+    switch (browser) {
+      case 'chrome':
+        launched = spawn(chrome, [
+            '--app='+uri
+          , '--no-first-run'
+          , '--disable-translate'
+          , '--no-default-browser-check'
+          , '--disable-default-apps'
+          , '--disable-popup-blocking'
+          , '--disable-zero-browsers-open-for-tests'
+          , '--user-data-dir=' + tmp
+          , '--load-extension=' + __dirname + '/lib/extension-chrome'
+        ])
+      break
+      case 'firefox':
+        launched = spawn(firefox, [
+            uri
+          , '-new-instance'
+          , '-profile', tmp
+          , '-purgecaches'
+        ])
+      break
+      default:
+        return stream.emit('error', new Error('Unknown browser: ' + browser))
+      break
+    }
+
+    launched.once('exit', stream.shutdown)
     stream.emit('spawn', launched)
     process.once('exit', stream.shutdown)
     process.once('close', stream.shutdown)

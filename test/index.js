@@ -1,4 +1,4 @@
-require('./capture')
+// require('./capture')
 require('./cleanup')
 require('./closing')
 require('./errors')
