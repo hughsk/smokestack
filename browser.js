@@ -1,3 +1,6 @@
+// For requiring smokestack-specific behavior in your test files.
+// Namely, smokestack's screenshot feature.
+
 var DOMEvent = require('synthetic-dom-events')
 var xhr      = require('xhr')
 

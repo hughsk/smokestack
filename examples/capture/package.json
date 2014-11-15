@@ -1,0 +1,11 @@
+{
+  "name": "smokestack-capture-example",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "browserify test.js | ../../bin/smokestack.js -b chrome"
+  },
+  "devDependencies": {
+    "browserify": "^6.3.2",
+    "tap-spec": "^1.0.1"
+  }
+}
