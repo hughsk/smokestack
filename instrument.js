@@ -43,7 +43,7 @@ window.close = function() {
     shoe.write(JSON.stringify({ end: true }))
     shoe.write('\n')
     shoe.once('data', function(data) {
-      close()
+      shoe.end()
     })
   })
 }

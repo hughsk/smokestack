@@ -4,7 +4,10 @@ if (process.env.browser === 'chrome') {
   require('./capture')
 }
 
-require('./cleanup')
+if (process.env.browser !== 'saucelabs') {
+  require('./cleanup')
+}
+
 require('./closing')
 require('./errors')
 require('./events')

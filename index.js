@@ -3,6 +3,7 @@ var debug    = require('debug')('smokestack')
 var spawn    = require('child_process').spawn
 var firefox  = require('firefox-location')
 var chrome   = require('chrome-location')
+var tunnel   = require('localtunnel')
 var through  = require('through2')
 var rimraf   = require('rimraf')
 var mkdirp   = require('mkdirp')
@@ -14,14 +15,9 @@ var util     = require('util')
 var url      = require('url')
 var fs       = require('fs')
 var bl       = require('bl')
+var wd       = require('wd')
 
-var bundle = fs.readFileSync(
-  path.join(__dirname, 'bundle.js')
-)
-
-var index = fs.readFileSync(
-  path.join(__dirname, 'index.html')
-)
+var createServer = require('./lib/server')
 
 module.exports = smokestack
 
@@ -29,27 +25,19 @@ function smokestack(opts) {
   opts = opts || {}
 
   var browser = opts.browser || 'chrome'
+
+  var tunneller = null
   var launched = null
-  var tmp = undefined
+  var sauce = null
+  var tmp = null
+
   var listen = false
   var script = false
 
   var stream = through(write, flush)
-  var server = http.createServer()
+  var server = createServer()
   var port   = opts.port || 0
   var buffer = []
-
-  server.on('request', function(req, res) {
-    var uri = url.parse(req.url).pathname
-    if (uri === '/') return send(res, index, 'text/html')
-    if (uri === '/script.js') return send(res, buffer, 'text/javascript')
-    if (uri === '/favicon.ico') return res.end()
-    if (uri === '/_upload') return upload(req, res)
-
-    res.statusCode = 302
-    res.setHeader('Location', '/')
-    res.end()
-  })
 
   server.listen(port, function(err) {
     stream.emit('listen', server)
@@ -72,10 +60,16 @@ function smokestack(opts) {
   }).install(server, '/smokestack')
 
   function handleInput(data, _, next) {
+    var self = this
+
     data = JSON.parse(data)
 
     if (data.end) {
-      return this.push('end\n')
+      this.push('end\n')
+
+      return setTimeout(function() {
+        if (self.writable) self.push(null)
+      }, 1000)
     }
 
     var key = data.shift()
@@ -85,25 +79,39 @@ function smokestack(opts) {
 
   stream.shutdown = function shutdown(fn) {
     // ensure shutdown only called once
-    if (shutdown.called) return fn && fn()
+    if (shutdown.called) return fn && fn(); shutdown.called = true
+    if (launched) launched.removeListener('exit', stream.shutdown)
     process.removeListener('exit', stream.shutdown)
     process.removeListener('close', stream.shutdown)
-    launched && launched.removeListener('exit', stream.shutdown)
 
-    shutdown.called = true
+    debug('Shutting down!')
+
     // kill child if necessary
     if (launched && !launched.killed) {
+      debug('Killing child process')
       launched.once('close', next)
       launched.kill()
     } else {
-      next()
+      if (tunneller) tunneller.close()
+      if (sauce) {
+        debug('Disconnecting browser session, closing tunnel')
+        sauce.quit(next)
+      } else {
+        next()
+      }
     }
+
+
     function next() {
       // remove tmpdir if necessary
+      debug('Removing temporary directory')
       tmp ? rimraf(tmp, next) : next()
+
       function next() {
-        // tmpdir if necessary
+        // closing server if necessary
+        debug('Shutting down host server')
         server._handle ? server.close(next) : next()
+
         function next() {
           tmp = null
           stream.emit('end')
@@ -111,6 +119,7 @@ function smokestack(opts) {
           process.nextTick(function() {
             stream.emit('finish')
             stream.emit('shutdown')
+            debug('Shutdown complete')
             fn && fn()
           })
         }
@@ -127,12 +136,59 @@ function smokestack(opts) {
 
   function flush() {
     buffer = buffer.join('')
-    buffer = [bundle, buffer].join(';\n')
+    server.updateBuffer(buffer)
     script = true
     if (listen) return open()
   }
 
   function open() {
+    return browser === 'saucelabs'
+      ? launchRemote()
+      : launchBrowser()
+  }
+
+  function launchRemote() {
+    debug('Launching remote test, using http://localtunnel.me')
+
+    tunnel(port, {
+      host: 'http://localtunnel.me/'
+    }, function(err, _tunneller) {
+      if (err) return stream.emit('error', err)
+      debug('localtunnel URL: %s', (tunneller = _tunneller).url)
+
+      var hostname = 'ondemand.saucelabs.com'
+      var hostport = 80
+      var user     = process.env.SAUCE_USERNAME
+      var key      = process.env.SAUCE_ACCESS_KEY
+      var config   = {
+          browserName: 'chrome'
+        , platform: 'MAC'
+        , javascriptEnabled: true
+        , takeScreenshot: true
+      }
+
+      debug('Connecting to %s', hostname)
+      debug('Username: %s', user)
+      debug('API Key: %s', key)
+      debug('Config: %o', config)
+
+      sauce = wd.remote(hostname, hostport, user, key)
+      sauce.init(config, function(err) {
+        if (err) return stream.emit('error', err)
+
+        debug('Connection established')
+        debug('Hitting %s', tunneller.url)
+
+        sauce.get(tunneller.url, function(err) {
+          if (err) return stream.emit('error', err)
+
+          debug('Hit %s successfully', tunneller.url)
+        })
+      })
+    })
+  }
+
+  function launchBrowser() {
     var uri = 'http://localhost:'+port+'/'
     tmp = quicktmp()
 
@@ -177,36 +233,5 @@ function smokestack(opts) {
     stream.emit('spawn', launched)
     process.once('exit', stream.shutdown)
     process.once('close', stream.shutdown)
-  }
-
-  function send(res, data, type) {
-    res.setHeader('content-type', type)
-    res.end(data)
-  }
-
-  function upload(req, res) {
-    req.pipe(bl(function(err, data) {
-      if (err) return bail(err, req, res)
-
-      data = JSON.parse(data)
-
-      var dst = path.resolve(data.dst)
-      var uri = data.uri.replace(/^.+base64,/g, '')
-      var img = new Buffer(uri, 'base64')
-
-      mkdirp(path.dirname(dst), function(err) {
-        if (err) return bail(err, req, res)
-
-        fs.writeFile(dst, img, function(err) {
-          if (err) return bail(err, req, res)
-          res.end()
-        })
-      })
-    }))
-  }
-
-  function bail(err, req, res) {
-    res.statusCode = 500
-    res.end([err.message, err.stack].join('\n'))
   }
 }
