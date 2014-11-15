@@ -28,7 +28,7 @@ module.exports = smokestack
 function smokestack(opts) {
   opts = opts || {}
 
-  var browser = opts.browser || 'firefox'
+  var browser = opts.browser || 'chrome'
   var launched = null
   var tmp = undefined
   var listen = false
