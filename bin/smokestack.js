@@ -14,7 +14,9 @@ var argv = minimist(process.argv.slice(2), {
     t: 'timeout',
     b: 'browser',
     p: 'port',
-    h: 'help'
+    h: 'help',
+    k: 'key',
+    u: 'username'
   }
 })
 
@@ -26,6 +28,8 @@ if (argv.help) {
 
 var browser = ss({
   saucelabs: argv.saucelabs,
+  sauceUsername: argv.username,
+  sauceKey: argv.key,
   browser: argv.browser,
   port: argv.port
 })
