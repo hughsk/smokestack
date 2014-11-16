@@ -3,7 +3,9 @@
 var minimist = require('minimist')
 var finished = require('tap-finished');
 var through = require('through2')
+var path = require('path')
 var ss = require('../')
+var fs = require('fs')
 
 var argv = minimist(process.argv.slice(2), {
   boolean: 'close',
@@ -11,9 +13,16 @@ var argv = minimist(process.argv.slice(2), {
     s: 'saucelabs',
     t: 'timeout',
     b: 'browser',
-    p: 'port'
+    p: 'port',
+    h: 'help'
   }
 })
+
+if (argv.help) {
+  return fs.createReadStream(path.join(__dirname, 'usage.txt'))
+    .once('close', function() { console.error() })
+    .pipe(process.stderr)
+}
 
 var browser = ss({
   saucelabs: argv.saucelabs,

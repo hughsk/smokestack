@@ -1,0 +1,14 @@
+
+Usage:
+  smokestack {OPTIONS} < script.js
+
+General:
+  -b, --browser  Specify which browser to use [default: chrome]
+  -t, --timeout  Specify the maximum timeout in milliseconds
+  -p, --port     Specify a port for smokestack to listen to
+  -h, --help     Display this message
+
+Sauce Labs only:
+  -s, --saucelabs  Include to run your tests on Sauce Labs
+  -u, --username   Username to log in with
+  -k, --key        API Access key to use
