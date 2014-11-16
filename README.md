@@ -138,7 +138,7 @@ defined too, so feel free to include the following in your `~/.bash_profile`
 and omit the `--username` and `--key` flags:
 
 ``` bash
-# Obviously, include your own credentials here:
+# Obviously, include your own, non-fake credentials here:
 export SAUCE_USERNAME='hughskennedy'
 export SAUCE_ACCESS_KEY='138b247bc5b6-b14b-a4d4-agcf-82c460a2'
 ```
