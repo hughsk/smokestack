@@ -8,6 +8,7 @@ var ss = require('../')
 var argv = minimist(process.argv.slice(2), {
   boolean: 'close',
   alias: {
+    s: 'saucelabs',
     t: 'timeout',
     b: 'browser',
     p: 'port'
@@ -15,6 +16,7 @@ var argv = minimist(process.argv.slice(2), {
 })
 
 var browser = ss({
+  saucelabs: argv.saucelabs,
   browser: argv.browser,
   port: argv.port
 })

@@ -26,6 +26,8 @@ function smokestack(opts) {
 
   var browser   = opts.browser || 'chrome'
   var saucelabs = !!opts.saucelabs
+  var sauceUser = opts.sauceUsername || process.env.SAUCE_USERNAME
+  var sauceKey  = opts.sauceKey || process.env.SAUCE_ACCESS_KEY
 
   var tunneller = null
   var launched = null
@@ -159,14 +161,17 @@ function smokestack(opts) {
 
       var hostname = 'ondemand.saucelabs.com'
       var hostport = 80
-      var user     = process.env.SAUCE_USERNAME
-      var key      = process.env.SAUCE_ACCESS_KEY
+      var user     = sauceUser
+      var key      = sauceKey
       var config   = {
           browserName: browser
         , platform: 'MAC'
         , javascriptEnabled: true
         , takeScreenshot: true
       }
+
+      if (!user) return stream.emit('error', new Error('No username provided for saucelabs'))
+      if (!key) return stream.emit('error', new Error('No access key provided for saucelabs'))
 
       debug('Connecting to %s', hostname)
       debug('Username: %s', user)
