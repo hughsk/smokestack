@@ -1,0 +1,28 @@
+{
+  "name": "smokestack",
+  "version": "1.0.0",
+  "description": "Hook for getting additional functionality out of Chrome from smokestack",
+  "manifest_version": 2,
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "desktopCapture",
+    "videoCapture",
+    "audioCapture",
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "run_at": "document_end",
+      "matches": [
+        "http://localhost:*/*",
+        "https://localhost:*/*"
+      ]
+    }
+  ]
+}

@@ -5,7 +5,7 @@ var bl = require('bl')
 var ss = require('../')
 
 test('will format log messages appropriately', function(t) {
-  var browser = ss()
+  var browser = ss({ browser: process.env.browser, saucelabs: !!process.env.sauce })
   browser.pipe(bl(function(err, data) {
     t.deepEqual(data.toString(), "The formatted message is: 'hello world'.\n")
     t.end()
@@ -14,4 +14,3 @@ test('will format log messages appropriately', function(t) {
   browser.write('window.close()')
   browser.end()
 })
-

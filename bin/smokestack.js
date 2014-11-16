@@ -3,14 +3,36 @@
 var minimist = require('minimist')
 var finished = require('tap-finished');
 var through = require('through2')
+var path = require('path')
 var ss = require('../')
+var fs = require('fs')
 
 var argv = minimist(process.argv.slice(2), {
   boolean: 'close',
-  alias: { t: 'timeout' }
+  alias: {
+    s: 'saucelabs',
+    t: 'timeout',
+    b: 'browser',
+    p: 'port',
+    h: 'help',
+    k: 'key',
+    u: 'username'
+  }
 })
 
-var browser = ss()
+if (argv.help) {
+  return fs.createReadStream(path.join(__dirname, 'usage.txt'))
+    .once('close', function() { console.error() })
+    .pipe(process.stderr)
+}
+
+var browser = ss({
+  saucelabs: argv.saucelabs,
+  sauceUsername: argv.username,
+  sauceKey: argv.key,
+  browser: argv.browser,
+  port: argv.port
+})
 
 var timeout = parseInt(argv['timeout'], 10)
 if (argv['close'] && !timeout) timeout = 1
@@ -23,26 +45,6 @@ process.stdin.on('end', function() {
 
 var pipeline = process.stdin
 .pipe(browser, {end: false})
-
-// TODO figure out a better way to handle closing the browser when tap
-// output is done. Probably doesn't belong in here.
-if (argv['tap']) {
-  pipeline.on('end', function() {
-    tapStream.end()
-  })
-
-  var tapStream = finished(function(result) {
-    browser.shutdown(function() {
-      process.exit(result.ok ? 0 : 1)
-    })
-  })
-
-  pipeline = pipeline.pipe(through(function(data, enc, cb) {
-    tapStream.write(data)
-    this.push(data)
-    cb()
-  }))
-}
 
 pipeline.pipe(process.stdout)
 

@@ -9,3 +9,8 @@ test('this should fail', function(t) {
   t.ok(false, 'an assertion')
   t.end()
 })
+
+test('shutdown', function() {
+  window.close()
+  t.end()
+})

@@ -3,33 +3,47 @@
   "version": "2.0.0",
   "description": "Pipe your JavaScript into a browser, logging console output in Node",
   "main": "index.js",
+  "browser": "browser.js",
   "bin": {
     "smokestack": "bin/smokestack.js"
   },
   "license": "MIT",
   "scripts": {
     "prepublish": "browserify instrument.js -o bundle.js",
-    "pretest": "npm prune && npm run prepublish",
-    "test": "tape test/*.js"
+    "pretest": "npm run prepublish",
+    "test": "npm run test:chrome && npm run test:firefox && npm run test:saucelabs",
+    "test:chrome": "browser=chrome node test/index.js | tap-spec",
+    "test:firefox": "browser=firefox node test/index.js | tap-spec",
+    "test:saucelabs": "sauce=1 browser=chrome node test/index.js | tap-spec"
   },
   "author": "Hugh Kennedy <hughskennedy@gmail.com> (http://hughsk.io/)",
   "dependencies": {
+    "bl": "^0.9.3",
     "chrome-location": "^1.0.1",
     "debug": "^2.0.0",
+    "firefox-location": "^1.0.0",
     "is-dom": "~1.0.4",
+    "localtunnel": "^1.5.0",
     "minimist": "~1.1.0",
+    "mkdirp": "^0.5.0",
+    "new-from": "0.0.3",
     "quick-tmp": "0.0.0",
     "rimraf": "~2.2.8",
     "shoe": "0.0.15",
     "split": "^0.3.0",
+    "synthetic-dom-events": "^0.2.2",
     "tap-finished": "0.0.1",
-    "through2": "^0.6.2"
+    "through2": "^0.6.2",
+    "wd": "^0.3.11",
+    "xhr": "^1.17.0"
   },
   "devDependencies": {
     "bl": "~0.9.3",
     "browserify": "^6.0.3",
     "json-stringify-safe": "^5.0.0",
+    "pngparse-sync": "^1.0.2",
     "sliced": "0.0.5",
+    "tap-spec": "^1.0.1",
     "tape": "~3.0.0"
   },
   "repository": {
