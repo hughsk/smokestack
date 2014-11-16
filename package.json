@@ -11,9 +11,10 @@
   "scripts": {
     "prepublish": "browserify instrument.js -o bundle.js",
     "pretest": "npm run prepublish",
-    "test": "npm run test:chrome && npm run test:firefox",
+    "test": "npm run test:chrome && npm run test:firefox && npm run test:saucelabs",
     "test:chrome": "browser=chrome node test/index.js | tap-spec",
-    "test:firefox": "browser=firefox node test/index.js | tap-spec"
+    "test:firefox": "browser=firefox node test/index.js | tap-spec",
+    "test:saucelabs": "sauce=1 browser=chrome node test/index.js | tap-spec"
   },
   "author": "Hugh Kennedy <hughskennedy@gmail.com> (http://hughsk.io/)",
   "dependencies": {

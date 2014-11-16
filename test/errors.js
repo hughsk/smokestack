@@ -7,8 +7,8 @@ var ss = require('../')
 var browserKind = process.env.browser
 
 test('will report errors', function(t) {
-  var browser = ss({ browser: browserKind })
-  var stack = /at http:\/\/localhost/g
+  var browser = ss({ browser: browserKind, saucelabs: !!process.env.saucelabs })
+  var stack = /at https?:\/\/.*\/script\.js/g
   var line = /Line\: \d+/g
 
   var buffer = bl(function(err, data) {

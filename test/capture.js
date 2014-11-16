@@ -8,7 +8,7 @@ var fs         = require('fs')
 
 test('desktop capture', function(t) {
   var bundler = browserify(path.join(__dirname, 'capture-browser.js')).bundle()
-  var browser = smokestack({ browser: process.env.browser })
+  var browser = smokestack({ browser: process.env.browser, saucelabs: !!process.env.sauce })
 
   bundler.pipe(browser).once('end', function() {
     var imgRed  = path.join(__dirname, 'screenshots', 'capture-red.png')

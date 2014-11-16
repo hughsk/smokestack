@@ -1,14 +1,13 @@
 process.env.browser = process.env.browser || 'chrome'
 
-if (process.env.browser === 'chrome') {
-  require('./capture')
-}
-
-if (process.env.browser !== 'saucelabs') {
+if (!process.env.sauce) {
+  if (process.env.browser === 'chrome') {
+    require('./capture')
+  }
   require('./cleanup')
+  require('./closing')
 }
 
-require('./closing')
 require('./errors')
 require('./events')
 require('./formatting')

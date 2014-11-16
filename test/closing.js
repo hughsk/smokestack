@@ -13,7 +13,7 @@ var bin = path.resolve(__dirname, '..', pkg.bin[pkg.name])
 
 test('browser.shutdown will shut it all down', function(t) {
   t.plan(3)
-  var browser = ss({ browser: process.env.browser })
+  var browser = ss({ browser: process.env.browser, saucelabs: !!process.env.sauce })
   var child = undefined
   var server = undefined
   browser.once('spawn', function(spawned) {
@@ -36,7 +36,7 @@ test('browser.shutdown will shut it all down', function(t) {
 })
 
 test('kills process on window.close', function(t) {
-  var browser = ss({ browser: process.env.browser })
+  var browser = ss({ browser: process.env.browser, saucelabs: !!process.env.sauce })
   var child = undefined
   browser.once('spawn', function(spawned) {
     child = spawned
@@ -55,7 +55,7 @@ test('kills process on window.close', function(t) {
 test('close browser if process dies prematurely', function(t) {
   var program = [
     "var ss = require('"+require.resolve('../')+"')",
-    "var browser = ss({ browser: process.env.browser })",
+    "var browser = ss({ browser: process.env.browser, saucelabs: !!process.env.sauce })",
     "browser.on('spawn', function(child) {",
     "  console.log(child.pid)",
     "})",

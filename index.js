@@ -24,7 +24,8 @@ module.exports = smokestack
 function smokestack(opts) {
   opts = opts || {}
 
-  var browser = opts.browser || 'chrome'
+  var browser   = opts.browser || 'chrome'
+  var saucelabs = !!opts.saucelabs
 
   var tunneller = null
   var launched = null
@@ -142,7 +143,7 @@ function smokestack(opts) {
   }
 
   function open() {
-    return browser === 'saucelabs'
+    return saucelabs
       ? launchRemote()
       : launchBrowser()
   }
@@ -161,7 +162,7 @@ function smokestack(opts) {
       var user     = process.env.SAUCE_USERNAME
       var key      = process.env.SAUCE_ACCESS_KEY
       var config   = {
-          browserName: 'chrome'
+          browserName: browser
         , platform: 'MAC'
         , javascriptEnabled: true
         , takeScreenshot: true
