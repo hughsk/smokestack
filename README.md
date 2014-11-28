@@ -1,4 +1,7 @@
 # smokestack
+
+#### JavaScript goes in, log output comes out.
+
 ![](http://img.shields.io/badge/stability-experimental-orange.svg?style=flat)
 ![](http://img.shields.io/npm/v/smokestack.svg?style=flat)
 ![](http://img.shields.io/npm/dm/smokestack.svg?style=flat)
@@ -6,7 +9,7 @@
 
 [![NPM](https://nodei.co/npm/smokestack.png)](https://nodei.co/npm/smokestack/)
 
-Pipe your JavaScript into a browser of your choosing!
+Pipe your JavaScript into a browser of your choosing:
 
 * Local Google Chrome.
 * Local Mozilla Firefox.
