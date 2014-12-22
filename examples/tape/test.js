@@ -10,7 +10,7 @@ test('this should fail', function(t) {
   t.end()
 })
 
-test('shutdown', function() {
+test('shutdown', function(t) {
   window.close()
   t.end()
 })
