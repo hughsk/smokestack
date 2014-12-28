@@ -27,7 +27,6 @@
     "minimist": "~1.1.0",
     "mkdirp": "^0.5.0",
     "new-from": "0.0.3",
-    "quick-tmp": "0.0.0",
     "rimraf": "~2.2.8",
     "shoe": "0.0.15",
     "split": "^0.3.0",

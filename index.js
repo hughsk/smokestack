@@ -1,4 +1,3 @@
-var quicktmp = require('quick-tmp')('smokestack')
 var debug    = require('debug')('smokestack')
 var spawn    = require('child_process').spawn
 var firefox  = require('firefox-launch')
@@ -32,7 +31,6 @@ function smokestack(opts) {
   var tunneller = null
   var launched = null
   var sauce = null
-  var tmp = null
 
   var listen = false
   var script = false
@@ -110,7 +108,6 @@ function smokestack(opts) {
       server._handle ? server.close(next) : next()
 
       function next() {
-        tmp = null
         stream.emit('end')
         stream.emit('close')
         process.nextTick(function() {
@@ -189,7 +186,6 @@ function smokestack(opts) {
 
   function launchBrowser() {
     var uri = 'http://localhost:'+port+'/'
-    tmp = quicktmp()
 
     switch (browser) {
       case 'chrome':
