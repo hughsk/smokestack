@@ -1,8 +1,8 @@
 var quicktmp = require('quick-tmp')('smokestack')
 var debug    = require('debug')('smokestack')
 var spawn    = require('child_process').spawn
-var firefox  = require('firefox-location')
-var chrome   = require('chrome-location')
+var firefox  = require('firefox-launch')
+var chrome   = require('chrome-launch')
 var tunnel   = require('localtunnel')
 var through  = require('through2')
 var rimraf   = require('rimraf')
@@ -104,28 +104,21 @@ function smokestack(opts) {
       }
     }
 
-
     function next() {
-      // remove tmpdir if necessary
-      debug('Removing temporary directory')
-      tmp ? rimraf(tmp, next) : next()
+      // closing server if necessary
+      debug('Shutting down host server')
+      server._handle ? server.close(next) : next()
 
       function next() {
-        // closing server if necessary
-        debug('Shutting down host server')
-        server._handle ? server.close(next) : next()
-
-        function next() {
-          tmp = null
-          stream.emit('end')
-          stream.emit('close')
-          process.nextTick(function() {
-            stream.emit('finish')
-            stream.emit('shutdown')
-            debug('Shutdown complete')
-            fn && fn()
-          })
-        }
+        tmp = null
+        stream.emit('end')
+        stream.emit('close')
+        process.nextTick(function() {
+          stream.emit('finish')
+          stream.emit('shutdown')
+          debug('Shutdown complete')
+          fn && fn()
+        })
       }
     }
   }
@@ -200,35 +193,12 @@ function smokestack(opts) {
 
     switch (browser) {
       case 'chrome':
-        launched = spawn(chrome, [
-            '--app='+uri
-          , '--no-first-run'
-          , '--disable-translate'
-          , '--no-default-browser-check'
-          , '--disable-default-apps'
-          , '--disable-popup-blocking'
-          , '--disable-zero-browsers-open-for-tests'
-          , '--user-data-dir=' + tmp
-          , '--load-extension=' + __dirname + '/lib/extension-chrome'
-        ])
+        launched = chrome(uri, {
+          args: ['--load-extension=' + __dirname + '/lib/extension-chrome']
+        })
       break
       case 'firefox':
-        mkdirp.sync(tmp)
-        fs.writeFileSync(path.join(tmp, 'user.js'), [
-            'user_pref("browser.shell.checkDefaultBrowser", false);'
-          , 'user_pref("browser.bookmarks.restore_default_bookmarks", false);'
-          , 'user_pref("dom.allow_scripts_to_close_windows", true);'
-          , 'user_pref("dom.disable_open_during_load", false);'
-          , 'user_pref("dom.max_script_run_time", 0);'
-        ].join('\n'))
-
-        launched = spawn(firefox, [
-            uri
-          , '-new-instance'
-          , '-no-remote'
-          , '-profile', tmp
-          , '-purgecaches'
-        ])
+        launched = firefox(uri)
       break
       default:
         return stream.emit('error', new Error('Unknown browser: ' + browser))

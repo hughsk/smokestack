@@ -19,9 +19,9 @@
   "author": "Hugh Kennedy <hughskennedy@gmail.com> (http://hughsk.io/)",
   "dependencies": {
     "bl": "^0.9.3",
-    "chrome-location": "^1.0.1",
+    "chrome-launch": "^1.1.1",
     "debug": "^2.0.0",
-    "firefox-location": "^1.0.0",
+    "firefox-launch": "^1.0.0",
     "is-dom": "~1.0.4",
     "localtunnel": "^1.5.0",
     "minimist": "~1.1.0",
