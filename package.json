@@ -1,6 +1,6 @@
 {
   "name": "smokestack",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Pipe your JavaScript into a browser, logging console output in Node",
   "main": "index.js",
   "browser": "browser.js",
