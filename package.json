@@ -38,7 +38,6 @@
     "xhr": "^1.17.0"
   },
   "devDependencies": {
-    "bl": "~0.9.3",
     "browserify": "^6.0.3",
     "json-stringify-safe": "^5.0.0",
     "pngparse-sync": "^1.0.2",
