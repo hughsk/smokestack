@@ -146,6 +146,10 @@ export SAUCE_USERNAME='hughskennedy'
 export SAUCE_ACCESS_KEY='138b247bc5b6-b14b-a4d4-agcf-82c460a2'
 ```
 
+## See Also
+- [tap-closer](https://github.com/hughsk/tap-closer) -- close the browser
+window once TAP tests have finished
+
 ## License
 
 MIT. See [LICENSE.md](http://github.com/hughsk/smokestack/blob/master/LICENSE.md) for details.
