@@ -1,11 +1,10 @@
-var xhr       = require('xhr')
-var shoe      = require('shoe')('/smokestack')
-var slice     = require('sliced')
-var isDom     = require('is-dom')
-var format    = require('util').format
-var styles    = require('ansistyles')
-var console   = window.console
-var stripAnsi = require('strip-ansi')
+var xhr     = require('xhr')
+var shoe    = require('shoe')('/smokestack')
+var slice   = require('sliced')
+var isDom   = require('is-dom')
+var format  = require('util').format
+var styles  = require('ansistyles')
+var console = window.console
 
 var browserKind = process.env.browser
 
@@ -79,7 +78,7 @@ xhr('script.js', function(err, resp) {
     error.fileName = error.fileName || filename
     error.lineNumber = error.lineNumber|| line
     error.columnNumber = error.columnNumber || col
-    
+
     var lines = src.trim().split('\n')
 
     // get 7 lines of context each side of error line
