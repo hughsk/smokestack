@@ -78,14 +78,15 @@ xhr('script.js', function(err, resp) {
   // guaranteed:
   // http://danlimerick.wordpress.com/2014/01/18/how-to-catch-javascript-errors-with-window-onerror-even-on-chrome-and-firefox/
   window.onerror = function(message, filename, line, col, error) {
-    if (!error) {
+    var supportsError = !!error
+    if (!supportsError) {
       var error = new Error(message)
-      error.stack = 'Error\n    at '+filename+':'+line+':'+col
+      error.stack = 'Error: '+message+'\n    at '+filename+':'+line+':'+col
     }
     error.fileName = error.fileName || filename
     error.lineNumber = error.lineNumber || line
     error.columnNumber = error.columnNumber || col
-    if (sourceMap) {
+    if (supportsError && sourceMap) {
       var sm = sourceMap.toObject()
       var smc = new SourceMap(sm)
       var original = smc.originalPositionFor({line: error.lineNumber, column: error.columnNumber})
