@@ -128,7 +128,6 @@ function smokestack(opts) {
   }
 
   function flush() {
-    buffer = buffer.join('')
     server.updateBuffer(buffer)
     script = true
     if (listen) return open()
