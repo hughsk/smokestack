@@ -53,18 +53,14 @@ test('kills process on window.close', function(t) {
 })
 
 test('close browser if process dies prematurely', function(t) {
-  var program = [
-    "var ss = require('"+require.resolve('../')+"')",
-    "var browser = ss({ browser: process.env.browser, saucelabs: !!process.env.sauce })",
-    "browser.on('spawn', function(child) {",
-    "  console.log(child.pid)",
-    "})",
-    "browser.on('connect', function(child) {",
-    "  process.exit()",
-    "})",
-    "browser.end()"
-  ].join(';')
-  exec('node -e "'+ program +'";', function(err, stdout) {
+  var startup = setTimeout(function() {
+    t.fail('Took too long to start!')
+    child && child.kill()
+    t.end()
+  }, 3000)
+
+  var child = exec(process.execPath + ' ' + require.resolve('./fixtures/pid-server'),  function(err, stdout) {
+    clearTimeout(startup)
     t.ifError(err)
     var pid = parseInt(stdout.trim())
     t.ok(pid, pid + ' should be valid pid')
