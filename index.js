@@ -62,8 +62,7 @@ function smokestack(opts) {
 
   function handleInput(data, _, next) {
     var self = this
-
-    data = JSON.parse(data)
+    data = JSON.parse(String(data))
 
     if (data.end) {
       this.push('end\n')
