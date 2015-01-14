@@ -1,10 +1,16 @@
-var xhr     = require('xhr')
-var shoe    = require('shoe')('/smokestack')
-var slice   = require('sliced')
-var isDom   = require('is-dom')
-var format  = require('util').format
-var styles  = require('ansistyles')
-var console = window.console
+var xhr       = require('xhr')
+var shoe      = require('shoe')('/smokestack')
+var slice     = require('sliced')
+var isDom     = require('is-dom')
+var format    = require('util').format
+var styles    = require('ansistyles')
+var console   = window.console
+var stripAnsi = require('strip-ansi')
+var SourceMap = require('source-map').SourceMapConsumer
+
+require('source-map-support').install()
+
+var convert = require('convert-source-map');
 
 var browserKind = process.env.browser
 
@@ -66,6 +72,7 @@ shoe.on('end', function() {
 xhr('script.js', function(err, resp) {
   if (err) return console.error(err)
   var src = resp.body
+  var sourceMap = convert.fromSource(src)
   // Not all browsers support the full function signature
   // of window.onerror, so the Error instance is not always
   // guaranteed:
@@ -76,30 +83,17 @@ xhr('script.js', function(err, resp) {
       error.stack = 'Error\n    at '+filename+':'+line+':'+col
     }
     error.fileName = error.fileName || filename
-    error.lineNumber = error.lineNumber|| line
+    error.lineNumber = error.lineNumber || line
     error.columnNumber = error.columnNumber || col
-
-    var lines = src.trim().split('\n')
-
-    // get 7 lines of context each side of error line
-    var contextLines = lines.length <= 7 ? lines.slice(0, 15) : lines.slice(error.lineNumber - 7, error.lineNumber + 7)
-    var contextLine = lines.length <= 15 ? error.lineNumber : 7
-    contextLines[contextLine - 1] = styles.bright(contextLines[contextLine - 1])
-    contextLines = contextLines.join('\n    ').split('\n')
-    contextLines[contextLine - 1] = '>' + contextLines[contextLine - 1].slice(1)
-
-    // write different data to remote console
-    // and window console.
-    write('error', [(error.name || 'Error') + ': ' + error.message + '\n'])
-    write('error', ['    ' + contextLines.join('\n') + '\n'])
-
-    if (window.navigator.userAgent.indexOf('Firefox') !== -1) {
-      write('error', [error.stack]) // firefox stack traces are lacklustre
+    if (sourceMap) {
+      var sm = sourceMap.toObject()
+      var smc = new SourceMap(sm)
+      var original = smc.originalPositionFor({line: error.lineNumber, column: error.columnNumber})
+      var source = smc.sourceContentFor(original.source)
+      logError(source, error, original)
     } else {
-      write('error', [error.stack.split('\n').slice(1).join('\n')])
+      logError(src, error)
     }
-    nativeConsole.error(error)
-
     window.close()
   }
 
@@ -107,4 +101,27 @@ xhr('script.js', function(err, resp) {
   script.type = "text\/javascript"
   document.body.appendChild(script)
   script.src = 'script.js'
+
 })
+
+function logError(src, error, position) {
+  var lines = src.trim().split('\n')
+  position = position || {
+    line: error.lineNumber,
+    column: error.columnNumber,
+    source: error.filename
+  }
+  var errorLine = '' + lines[position.line - 1]
+  var spaces = ''
+  write('error', [position.source + ':' +position.line])
+  for (var i = 0; i < position.column; i++) {
+    spaces += ' '
+  }
+  var columnLine = spaces + '^'
+  var errorLines = [errorLine, columnLine]
+  // write different data to remote console
+  // and window console.
+  write('error', [errorLines.join('\n') + '\n'])
+  write('error', [error.stack])
+  nativeConsole.error(error)
+}

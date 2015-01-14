@@ -10,7 +10,7 @@ test(browserKind + ' will report errors', function(t) {
   var browser = ss({ browser: browserKind, saucelabs: !!process.env.saucelabs })
   var stack = /https?:\/\/.*\/script\.js/g
   var line = /script\.js:2:\d/g
-  var context = /Math\.random/g
+  var context = /throw new Error/g
 
   var buffer = bl(function(err, data) {
     data = String(data)
