@@ -5,7 +5,6 @@ var isDom     = require('is-dom')
 var format    = require('util').format
 var styles    = require('ansistyles')
 var console   = window.console
-var stripAnsi = require('strip-ansi')
 var SourceMap = require('source-map').SourceMapConsumer
 
 require('source-map-support').install()
