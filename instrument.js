@@ -3,13 +3,12 @@ var shoe      = require('shoe')('/smokestack')
 var slice     = require('sliced')
 var isDom     = require('is-dom')
 var format    = require('util').format
-var styles    = require('ansistyles')
+var convert   = require('convert-source-map')
 var console   = window.console
 var SourceMap = require('source-map').SourceMapConsumer
 
+// magical auto-correction of error stack traces in v8
 require('source-map-support').install()
-
-var convert = require('convert-source-map');
 
 var browserKind = process.env.browser
 
@@ -101,7 +100,6 @@ xhr('script.js', function(err, resp) {
   script.type = "text\/javascript"
   document.body.appendChild(script)
   script.src = 'script.js'
-
 })
 
 function logError(src, error, position) {
