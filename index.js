@@ -4,16 +4,9 @@ var firefox  = require('firefox-launch')
 var chrome   = require('chrome-launch')
 var tunnel   = require('localtunnel')
 var through  = require('through2')
-var rimraf   = require('rimraf')
-var mkdirp   = require('mkdirp')
 var split    = require('split')
 var shoe     = require('shoe')
-var http     = require('http')
-var path     = require('path')
-var util     = require('util')
 var url      = require('url')
-var fs       = require('fs')
-var bl       = require('bl')
 var wd       = require('wd')
 
 var createServer = require('./lib/server')
@@ -72,7 +65,7 @@ function smokestack(opts) {
       }, 1000)
     }
 
-    var key = data.shift()
+    data.shift() // remove prefix/key e.g. log/error/warn
     stream.push(data + '\n')
     next()
   }

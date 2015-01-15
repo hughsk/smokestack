@@ -10,8 +10,6 @@ var SourceMap = require('source-map').SourceMapConsumer
 // magical auto-correction of error stack traces in v8
 require('source-map-support').install()
 
-var browserKind = process.env.browser
-
 // keep around so can call
 // console methods without sending data to server
 var nativeConsole = {}
@@ -57,7 +55,7 @@ window.close = function() {
   setTimeout(function() {
     shoe.write(JSON.stringify({ end: true }))
     shoe.write('\n')
-    shoe.once('data', function(data) {
+    shoe.once('data', function() {
       shoe.end()
     })
   })
