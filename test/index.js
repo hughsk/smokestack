@@ -10,6 +10,7 @@ if (!process.env.sauce) {
   require('./closing')
 }
 
+require('./large-files')
 require('./errors')
 require('./events')
 require('./formatting')
