@@ -118,6 +118,14 @@ function logError(src, error, position) {
   // write different data to remote console
   // and window console.
   write('error', [errorLines.join('\n') + '\n'])
-  write('error', [error.stack])
+  
+  // it's possible that we can fail to get a stack
+  try {
+    write('error', [error.stack])
+  }
+  catch (e) {
+    write('error', ['Could not get stack trace because:', e.message])
+  }
+
   nativeConsole.error(error)
 }
