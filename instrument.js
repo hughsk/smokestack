@@ -6,9 +6,18 @@ var format    = require('util').format
 var convert   = require('convert-source-map')
 var console   = window.console
 var SourceMap = require('source-map').SourceMapConsumer
+var cachedSourceMap
+var cachedBody
 
 // magical auto-correction of error stack traces in v8
-require('source-map-support').install()
+require('source-map-support').install({
+  retrieveSourceMap: function(source) {
+    return {
+      url: source
+      , map: cachedSourceMap.sourcemap
+    }
+  }
+})
 
 // keep around so can call
 // console methods without sending data to server
@@ -67,41 +76,43 @@ shoe.on('end', function() {
 
 xhr('script.js', function(err, resp) {
   if (err) return console.error(err)
-  var src = resp.body
+
   // large sourcemaps will fail to parse, this is suprisingly common.
   // so, we'll use the "large source map option", which is faster anyway
-  var sourceMap = convert.fromSource(src, true)
+  cachedSourceMap = convert.fromSource(cachedBody, true)
 
-  // Not all browsers support the full function signature
-  // of window.onerror, so the Error instance is not always
-  // guaranteed:
-  // http://danlimerick.wordpress.com/2014/01/18/how-to-catch-javascript-errors-with-window-onerror-even-on-chrome-and-firefox/
-  window.onerror = function(message, filename, line, col, error) {
-    var supportsError = !!error
-    if (!supportsError) {
-      var error = new Error(message)
-      error.stack = 'Error: '+message+'\n    at '+filename+':'+line+':'+col
-    }
-    error.fileName = error.fileName || filename
-    error.lineNumber = error.lineNumber || line
-    error.columnNumber = error.columnNumber || col
-    if (supportsError && sourceMap) {
-      var sm = sourceMap.toObject()
-      var smc = new SourceMap(sm)
-      var original = smc.originalPositionFor({line: error.lineNumber, column: error.columnNumber})
-      var source = smc.sourceContentFor(original.source)
-      logError(source, error, original)
-    } else {
-      logError(src, error)
-    }
-    window.close()
-  }
-
+  // now that we've gotten the source map, we can run the tests
   var script = document.createElement("script")
   script.type = "text\/javascript"
   document.body.appendChild(script)
   script.src = 'script.js'
 })
+
+window.onerror = function(message, filename, line, col, error) {
+  var supportsError = !!error
+  if (!supportsError) {
+    var error = new Error(message)
+    error.stack = 'Error: '+message+'\n    at '+filename+':'+line+':'+col
+  }
+  error.fileName = error.fileName || filename
+  error.lineNumber = error.lineNumber || line
+  error.columnNumber = error.columnNumber || col
+  if (supportsError && cachedSourceMap) {
+    var sm = cachedSourceMap.toObject()
+    var smc = new SourceMap(sm)
+    var original = smc.originalPositionFor({line: error.lineNumber, column: error.columnNumber})
+    var source = smc.sourceContentFor(original.source)
+    logError(source, error, original)
+  }
+  else {
+    logError(cachedBody, error, {
+      source: filename
+      , line: line
+      , column: col
+    })
+  }
+  window.close()
+}
 
 function logError(src, error, position) {
   var lines = src.trim().split('\n')
@@ -116,7 +127,8 @@ function logError(src, error, position) {
   // write in tap format so that test fail when there's an uncaught exception
   write('error', ['not ok - ' + error.message])
 
-  write('error', [position.source + ':' +position.line])
+  write('error', [position.source + ':' + position.line])
+
   for (var i = 0; i < position.column; i++) {
     spaces += ' '
   }

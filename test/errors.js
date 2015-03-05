@@ -6,7 +6,8 @@ var fs = require('fs')
 var ss = require('../')
 var browserify = require('browserify')
 
-var browserKind = process.env.browser
+// chrome is the default
+var browserKind = process.env.browser || 'chrome'
 
 test(browserKind + ' will report errors', function(t) {
   var browser = ss({ browser: browserKind, saucelabs: !!process.env.saucelabs })
