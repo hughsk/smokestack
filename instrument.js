@@ -68,7 +68,10 @@ shoe.on('end', function() {
 xhr('script.js', function(err, resp) {
   if (err) return console.error(err)
   var src = resp.body
-  var sourceMap = convert.fromSource(src)
+  // large sourcemaps will fail to parse, this is suprisingly common.
+  // so, we'll use the "large source map option", which is faster anyway
+  var sourceMap = convert.fromSource(src, true)
+
   // Not all browsers support the full function signature
   // of window.onerror, so the Error instance is not always
   // guaranteed:
