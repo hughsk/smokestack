@@ -16,10 +16,12 @@ test('can handle large files', function(t) {
     t.end()
   }))
 
-  // 32 megabytes
-  var buffer = []
 
-  for (var i = 0; i < 32; i++)
+  // saucelabs seems to have problems when files
+  // larger than 2MB
+  var size = process.env.sauce ? 2 : 32
+  var buffer = []
+  for (var i = 0; i < size; i++)
   for (var j = 0; j < 1024; j++) {
     var data = []
 
