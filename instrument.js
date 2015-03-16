@@ -147,9 +147,9 @@ function logError(src, error, position) {
 
   // it's possible that we can fail to get a stack
   try {
-    write('error', [error.stack])
+    write('error', [error.stack || error.message])
   } catch (e) {
-    write('error', ['Could not get stack trace because:', e.message])
+    write('error', ['Could not get stack trace because:', e.stack || e.message])
   }
 
   nativeConsole.error(error)
