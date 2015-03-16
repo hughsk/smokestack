@@ -6,18 +6,9 @@ var format    = require('util').format
 var convert   = require('convert-source-map')
 var console   = window.console
 var SourceMap = require('source-map').SourceMapConsumer
+var mapErrors = require('source-map-support')
 var cachedSourceMap
 var cachedBody
-
-// magical auto-correction of error stack traces in v8
-require('source-map-support').install({
-  retrieveSourceMap: function(source) {
-    return {
-      url: source
-      , map: cachedSourceMap.sourcemap
-    }
-  }
-})
 
 // keep around so can call
 // console methods without sending data to server
@@ -79,7 +70,23 @@ xhr('script.js', function(err, resp) {
 
   // large sourcemaps will fail to parse, this is suprisingly common.
   // so, we'll use the "large source map option", which is faster anyway
+  cachedBody = resp.body || ''
   cachedSourceMap = convert.fromSource(cachedBody, true)
+
+  // magical auto-correction of error stack traces in v8
+  if (!cachedSourceMap) {
+    mapErrors.install({handleUncaughtExceptions: false})
+  } else {
+    mapErrors.install({
+      handleUncaughtExceptions: false
+    , retrieveSourceMap: function(source) {
+      return {
+          url: source
+        , map: cachedSourceMap && cachedSourceMap.sourcemap || ''
+      }
+    }
+  })
+  }
 
   // now that we've gotten the source map, we can run the tests
   var script = document.createElement("script")
