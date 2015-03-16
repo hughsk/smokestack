@@ -7,7 +7,10 @@ var ss = require('../')
 test('can pipe data in and get stderr and stdout', function(t) {
   var browser = ss({ browser: process.env.browser, saucelabs: !!process.env.sauce })
   browser.pipe(bl(function(err, data) {
-    t.deepEqual(data.toString().trim().split('\n'), [
+    if (err) return t.end(err)
+    t.ok(data, 'data exists')
+    data = String(data).trim()
+    t.deepEqual(data.split('\n'), [
       'log',
       'info',
       'warn',

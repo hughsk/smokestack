@@ -8,7 +8,9 @@ var exec = require('child_process').exec
 test('can log html elements', function(t) {
   var browser = ss({ browser: process.env.browser, saucelabs: !!process.env.sauce })
   browser.pipe(bl(function(err, data) {
-    data = data.toString().trim()
+    if (err) return t.end(err)
+    t.ok(data, 'data exists')
+    data = String(data).trim()
     t.equal(data, '[object HTMLBodyElement]')
     t.end()
   }))
@@ -26,7 +28,9 @@ test('can log document', function(t) {
   // into account.
   var browser = ss({ browser: process.env.browser, saucelabs: !!process.env.sauce })
   browser.pipe(bl(function(err, data) {
-    data = data.toString().trim()
+    if (err) return t.end(err)
+    t.ok(data, 'data exists')
+    data = String(data).trim()
     t.equal(data, '[object HTMLDocument]')
     t.end()
   }))
@@ -79,15 +83,16 @@ function matchesNodeOutput(commands) {
     }).join(';')
 
     exec(process.execPath + ' -e "' + vals + '"', function(err, orig) {
-      if (err) return t.fail(err.message)
+      if (err) return t.end(err)
 
       var browser = ss({ browser: process.env.browser, saucelabs: !!process.env.sauce })
 
       browser.pipe(bl(function(err, data) {
-        if (err) return t.fail(err.message)
-
-        var actual = String(data).split('\n')
-        var expected = String(orig).split('\n')
+        if (err) return t.end(err)
+        t.ok(data, 'data exists')
+        data = String(data).trim()
+        var actual = data.trim().split('\n')
+        var expected = orig.trim().split('\n')
         var names = keys.filter(function(key) {
           return key.charAt(0) !== '_'
         })

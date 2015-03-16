@@ -12,10 +12,12 @@ var browserKind = process.env.browser || 'chrome'
 test(browserKind + ' will report errors', function(t) {
   var browser = ss({ browser: browserKind, saucelabs: !!process.env.saucelabs })
   var stack = /https?:\/\/.*\/script\.js/g
-  var line = /script\.js:2:\d/g
+  var line = /script\.js:2/g
   var context = /throw new Error/g
 
   var buffer = bl(function(err, data) {
+    if (err) return t.end(err)
+    t.ok(data, 'data exists')
     data = String(data)
     t.ok(/badness happened/gm.test(data), 'contains error message')
     t.ok(line.test(data), 'contains line number')
@@ -36,6 +38,8 @@ test(browserKind + ' will report errors with sourcemap support', function(t) {
   var context = /throw new Error/g
 
   var buffer = bl(function(err, data) {
+    if (err) return t.end(err)
+    t.ok(data, 'data exists')
     data = String(data)
     t.ok(/badness happened/gm.test(data), 'contains error message')
     // this will start working in a new firefox ~39

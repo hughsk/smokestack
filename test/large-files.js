@@ -10,9 +10,10 @@ test('can handle large files', function(t) {
   })
 
   browser.pipe(bl(function(err, data) {
-    t.ifError(err)
+    if (err) return t.end(err)
     t.ok(data, 'data exists')
-    t.equal(String(data).trim(), 'hello world')
+    data = String(data).trim()
+    t.equal(data, 'hello world')
     t.end()
   }))
 

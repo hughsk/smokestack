@@ -15,14 +15,16 @@ test('closes cleanly in the simplest case', function(t) {
       : []
   ))
 
-  t.plan(2)
+  t.plan(3)
 
   fs.createReadStream(path.join(__dirname, 'clean-close-browser.js'))
     .pipe(browser.stdin)
 
   browser.stdout.pipe(bl(function(err, data) {
-    if (err) return t.fail(err.message)
-    t.equal(String(data), 'hello world\n', 'output the correct data')
+    if (err) return t.end(err)
+    t.ok(data, 'data exists')
+    data = String(data)
+    t.equal(data, 'hello world\n', 'output the correct data')
   }))
 
   browser.once('exit', function() {

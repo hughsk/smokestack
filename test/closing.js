@@ -61,7 +61,7 @@ test('close browser if process dies prematurely', function(t) {
 
   var child = exec(process.execPath + ' ' + require.resolve('./fixtures/pid-server'),  function(err, stdout) {
     clearTimeout(startup)
-    t.ifError(err)
+    if (err) return t.fail(err.stack || err.message)
     var pid = parseInt(stdout.trim())
     t.ok(pid, pid + ' should be valid pid')
     setTimeout(function() {
@@ -83,7 +83,7 @@ test('executable will close automatically with --close', function(t) {
 
 test('executable will not close automatically without --close', function(t) {
   getCloseTime(function(err, normalCloseTime) {
-    t.ifError(err)
+    if (err) return t.end(err)
     var browser = spawn(bin, ['-b', process.env.browser])
     browser.stderr.pipe(process.stderr)
     browser.once('close', fail)
@@ -108,7 +108,7 @@ test('executable will not close automatically without --close', function(t) {
 
 test('executable will close after --timeout time', function(t) {
   getCloseTime(function(err, normalCloseTime) {
-    t.ifError(err)
+    if (err) return t.end(err)
     var browser = spawn(bin, ['--timeout', normalCloseTime/2, '-b', process.env.browser])
     browser.stdout.pipe(process.stdout)
     browser.once('close', fail)
@@ -131,7 +131,7 @@ test('executable will close after --timeout time', function(t) {
 
 test('executable will close after --timeout time even if browser locked', function(t) {
   getCloseTime(function(err, normalCloseTime) {
-    t.ifError(err)
+    if (err) return t.end(err)
     var browser = spawn(bin, ['--timeout', normalCloseTime/2, '-b', process.env.browser])
     browser.stderr.pipe(process.stderr)
     browser.once('close', function() {

@@ -16,7 +16,10 @@ test('can pipe data in and get stdout and stderr', function(t) {
     t.fail('Exit with error!', arguments)
   })
   browser.stdout.pipe(bl(function(err, data) {
-    t.deepEqual(data.toString().trim().split('\n'), [
+    if (err) return t.end(err)
+    t.ok(data, 'data exists')
+    data = String(data).trim()
+    t.deepEqual(data.split('\n'), [
       'log',
       'info',
       'warn',
