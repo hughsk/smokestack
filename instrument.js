@@ -78,21 +78,17 @@ xhr('script.js', function(err, resp) {
     mapErrors.install({handleUncaughtExceptions: false})
   } else {
     mapErrors.install({
-      handleUncaughtExceptions: false
-    , retrieveSourceMap: function(source) {
-      return {
-          url: source
-        , map: cachedSourceMap && cachedSourceMap.sourcemap || ''
+        handleUncaughtExceptions: false
+      , retrieveSourceMap: function(source) {
+        return {
+            url: source
+          , map: cachedSourceMap && cachedSourceMap.sourcemap || ''
+        }
       }
-    }
-  })
+    })
   }
 
-  // now that we've gotten the source map, we can run the tests
-  var script = document.createElement("script")
-  script.type = "text\/javascript"
-  document.body.appendChild(script)
-  script.src = 'script.js'
+  start()
 })
 
 window.onerror = function(message, filename, line, col, error) {
@@ -153,4 +149,12 @@ function logError(src, error, position) {
   }
 
   nativeConsole.error(error)
+}
+
+function start() {
+  // now that we've gotten the source map, we can run the tests
+  var script = document.createElement("script")
+  script.type = "text\/javascript"
+  document.body.appendChild(script)
+  script.src = 'script.js'
 }
