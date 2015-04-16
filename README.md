@@ -7,7 +7,7 @@
 ![](http://img.shields.io/npm/dm/smokestack.svg?style=flat)
 ![](http://img.shields.io/npm/l/smokestack.svg?style=flat)
 
-[![NPM](https://nodei.co/npm/smokestack.png)](https://nodei.co/npm/smokestack/)
+[![NPM](https://nodei.co/npm/smokestack.png?downloads=true&downloadRank=true)](https://nodei.co/npm/smokestack/)
 
 Pipe your JavaScript into a browser of your choosing:
 
