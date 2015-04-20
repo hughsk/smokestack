@@ -1,6 +1,6 @@
 # smokestack
 
-#### JavaScript goes in, log output comes out.
+#### JavaScript goes in, console logs come out.
 
 ![](http://img.shields.io/badge/stability-experimental-orange.svg?style=flat)
 ![](http://img.shields.io/npm/v/smokestack.svg?style=flat)
@@ -16,8 +16,8 @@ Pipe your JavaScript into a browser of your choosing:
 * [Sauce Labs](http://saucelabs.com) for the rest.
 
 A simple alternative to bigger browser automation tools, aiming to keep the
-interface and initial setup as simple as possible: JavaScript goes in, log
-output comes out. There's also support for browser screenshots in Chrome,
+interface and initial setup as simple as possible: JavaScript goes in,
+console logs come out. There's also support for browser screenshots in Chrome,
 with the other browsers getting support for that soon too.
 
 Designed for running UI tests on your desktop machine. You can use this,
