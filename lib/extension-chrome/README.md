@@ -2,7 +2,7 @@
 
 Loaded into each (otherwise "clean") Chrome instance when spawning smokestack.
 
-It's primary purpose is for capturing screenshots, which can *only* be
+Its primary purpose is for capturing screenshots, which can *only* be
 done using an extension. It's exposed using `smokestack.capture` in the browser:
 
 ``` javascript
