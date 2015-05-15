@@ -17,7 +17,7 @@ function smokestack(opts) {
   opts = opts || {}
 
   var browser   = opts.browser || 'chrome'
-  var saucelabs = !!opts.saucelabs
+  var saucelabs = !!opts.saucelabs || process.env.SAUCE
   var sauceUser = opts.sauceUsername || process.env.SAUCE_USERNAME
   var sauceKey  = opts.sauceKey || process.env.SAUCE_ACCESS_KEY
 
