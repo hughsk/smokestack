@@ -27,9 +27,9 @@ if (argv.help) {
 }
 
 var browser = ss({
-  saucelabs: argv.saucelabs,
-  sauceUsername: argv.username,
-  sauceKey: argv.key,
+  saucelabs: argv.saucelabs || process.env.SAUCE,
+  sauceUsername: argv.username || process.env.SAUCE_USERNAME,
+  sauceKey: argv.key || process.env.SAUCE_ACCESS_KEY,
   browser: argv.browser,
   port: argv.port
 })
