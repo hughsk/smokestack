@@ -146,6 +146,30 @@ export SAUCE_USERNAME='hughskennedy'
 export SAUCE_ACCESS_KEY='138b247bc5b6-b14b-a4d4-agcf-82c460a2'
 ```
 
+## Headless Browsers
+
+You may be able to run a browser headlessly using an [X virtual frame buffer](https://en.wikipedia.org/wiki/Xvfb).
+
+For example, on recent Debian linux:
+
+``` bash
+# Install Xvfb from Debian Repository
+sudo apt-get update
+sudo apt-get install -y xvfb
+
+# Install Google Chrome to google-chrome
+wget -c wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo dpkg -i google-chrome-stable_current_amd64.deb
+sudo ln -s $(which google-chrome-stable) /usr/bin/google-chrome
+
+# Start a virtual framebuffer display
+Xvfb :1 -screen 5 1024x768x8 &
+export DISPLAY=:1.5
+
+# Run tests in Chrome
+npm run test:chrome
+```
+
 ## See Also
 - [tap-closer](https://github.com/hughsk/tap-closer) -- close the browser
 window once TAP tests have finished
