@@ -24,6 +24,7 @@ function smokestack(opts) {
   var tunneller = null
   var launched = null
   var sauce = null
+  var interval = null
 
   var listen = false
   var script = false
@@ -78,6 +79,11 @@ function smokestack(opts) {
     process.removeListener('close', stream.shutdown)
 
     debug('Shutting down!')
+
+    // stop the "ping" interval
+    if (interval) {
+      clearInterval(interval)
+    }
 
     // kill child if necessary
     if (launched && !launched.killed) {
@@ -171,6 +177,11 @@ function smokestack(opts) {
 
           debug('Hit %s successfully', tunneller.url)
         })
+        // ping saucelabs every 10 seconds so the connection
+        // doesn't go down
+        interval = setInterval(function () {
+          sauce.eval('1 + 1')
+        }, 10000)
       })
     })
   }
