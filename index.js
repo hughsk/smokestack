@@ -72,6 +72,8 @@ function smokestack(opts) {
   }
 
   stream.shutdown = function shutdown(fn) {
+    if (typeof fn !== 'function') fn = false
+
     // ensure shutdown only called once
     if (shutdown.called) return fn && fn(); shutdown.called = true
     if (launched) launched.removeListener('exit', stream.shutdown)
