@@ -18,7 +18,7 @@
   },
   "author": "Hugh Kennedy <hughskennedy@gmail.com> (http://hughsk.io/)",
   "dependencies": {
-    "bl": "^0.9.4",
+    "bl": "^2.2.1",
     "boom": "^7.2.0",
     "chrome-launch": "^1.1.4",
     "convert-source-map": "^1.0.0",
