@@ -25,7 +25,7 @@
     "cryptiles": "^4.1.2",
     "debug": "^3.1.0",
     "firefox-launch": "^1.1.0",
-    "hawk": "^7.0.7",
+    "hawk": "^9.0.1",
     "hoek": "^5.0.3",
     "is-dom": "~1.0.5",
     "localtunnel": "^1.9.0",
